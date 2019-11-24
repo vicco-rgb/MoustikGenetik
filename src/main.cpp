@@ -33,14 +33,13 @@ int main (int argc, char *argv[]){
 	glutInitWindowPosition(0,0); // Position initiale de la fenetre GLUT
 	glutInitWindowSize(w,h); // Taille initiale de la fenetre GLUT
 	glutCreateWindow("DaddyLongLeg - Algo Genetique"); // Creation de la fenetre GLUT
-	glClearColor(0.1f, 0.1f, 0.1f, 0.0f);	// Définition de la couleur d'effacement du framebuffer //le fond est noir
+	glClearColor(0.1f, 0.1f, 0.1f, 0.0f);	//le fond est noir
 
 	// Définition des fonctions de callbacks
 	glutDisplayFunc(affichage);
 	glutKeyboardFunc(clavier);
-	glutKeyboardUpFunc(clavierUp);
 	glutReshapeFunc(reshape);
-	glutTimerFunc(1000/fps, update, 0);
+	glutTimerFunc((unsigned int)1000/fps, update, (float)fps);
 	currentTime = glutGet(GLUT_ELAPSED_TIME);
 	BigBang();
 	glutMainLoop(); // Lancement de la boucle infinie GLUT

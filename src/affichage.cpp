@@ -2,8 +2,6 @@
 #include "affichage.h"
 
 //VARIABLES
-GLfloat deplacement;
-
 extern int previousTime;
 extern int currentTime;
 extern int elapsedTime;
@@ -20,6 +18,34 @@ extern b2World* ptrWorld;
 
 
 int nTotFrames=0;
+GLvoid drawQuadrillage(int x1,int x2, int y1, int y2){
+	for (int i=y1;i<y2;i++){  //horiontales
+		glBegin(GL_QUADS);
+		glColor3f(0.2f,0.2f,0.2f);
+		glVertex2f(x1, i);
+		glColor3f(0.2f,0.2f,0.2f);
+		glVertex2f(x1, i-0.05);
+		glColor3f(0.2f,0.2f,0.2f);
+		glVertex2f(x2, i-0.05);
+		glColor3f(0.2f,0.2f,0.2f);
+		glVertex2f(x2, i);
+		glEnd();
+		glFlush();
+	}
+	for (int j=x1;j<x2;j++){ //verticales
+		glBegin(GL_QUADS);
+		glColor3f(0.2f,0.2f,0.2f);
+		glVertex2f(i-0.05, y2);
+		glColor3f(0.2f,0.2f,0.2f);
+		glVertex2f(i-0.05, y1);
+		glColor3f(0.2f,0.2f,0.2f);
+		glVertex2f(i, y1);
+		glColor3f(0.2f,0.2f,0.2f);
+		glVertex2f(i, y2);
+		glEnd();
+		glFlush();
+	}
+}
 void reshape(GLsizei width, GLsizei height) {
 	// GLsizei for non-negative integer
 	// Compute aspect ratio of the new window
@@ -42,6 +68,9 @@ void reshape(GLsizei width, GLsizei height) {
 }
 GLvoid affichage(){
 	glClear(GL_COLOR_BUFFER_BIT); 	// Effacement du frame buffer
+	drawQuadrillage(-2,5,-2,5);
+
+
 	glBegin(GL_QUADS); //sol
 	glColor3f(1.0f, 0.5f, 0.5f);
 	glVertex2f(groundBody->GetLocalCenter().x-groundWidth, groundBody->GetLocalCenter().y+groundHeight);
@@ -53,20 +82,6 @@ GLvoid affichage(){
 	glVertex2f(groundBody->GetLocalCenter().x+groundWidth, groundBody->GetLocalCenter().y+groundHeight);
 	glEnd();
 	glFlush();
-
-	for (int i=-2;i<5;i++){  //QUADRILLAGE
-		glBegin(GL_QUADS);
-		glColor3f(0.3f,0.3f,0.3f);
-		glVertex2f(0.5, i);
-		glColor3f(0.3f,0.3f,0.3f);
-		glVertex2f(0.5, i-0.05);
-		glColor3f(0.3f,0.3f,0.3f);
-		glVertex2f(10, i-0.05);
-		glColor3f(0.3f,0.3f,0.3f);
-		glVertex2f(10, i);
-		glEnd();
-		glFlush();
-	}
 
 	glBegin(GL_QUADS); //carre
 	glColor3f(0.5f, 0.5f, 0.5f);
@@ -85,12 +100,11 @@ GLvoid affichage(){
 	glutSwapBuffers();
 }
 GLvoid update(int fps){
-	glutTimerFunc(fps, update, 100/6); // setups the timer to be called again
+	glutTimerFunc((unsigned int)1000/fps, affichage, (float)fps); // setups the timer to be called again
 	PhysicEngine();
 	previousTime = currentTime;	// Get the time when the previous frame was rendered
-	currentTime = glutGet(GLUT_ELAPSED_TIME);	// Get the current time (in milliseconds) and calculate the elapsed time
-	elapsedTime = currentTime - previousTime;
-	deplacement = 0.01*elapsedTime;
+	currentTime = glutGet(GLUT_ELAPSED_TIME);	// Get the current time (in milliseconds)
+	elapsedTime = currentTime - previousTime; //calculate elapsed time
 	glutPostRedisplay();
 	nTotFrames++;
 }
@@ -110,7 +124,5 @@ GLvoid clavier(unsigned char touche, int x, int y) {
 		break;
 	}
 	// Demande a GLUT de reafficher la scene
-	glutPostRedisplay();
+	// glutPostRedisplay();
 }
-
-GLvoid clavierUp(unsigned char key, int x, int y){}

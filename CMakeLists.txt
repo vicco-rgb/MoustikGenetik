@@ -16,11 +16,10 @@ include_directories(headers)
 #FICHIERS .CPP
 file(GLOB SOURCES "src/*.cpp")
 
-
-add_executable(main.out ${SOURCES})
+add_executable(exec ${SOURCES})
 
 target_link_libraries(
-  main.out
+  exec
   ${OPENGL_LIBRARIES}
   ${GLUT_LIBRARIES}
   Box2D

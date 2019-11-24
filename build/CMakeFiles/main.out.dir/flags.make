@@ -6,5 +6,5 @@ CXX_FLAGS = -g
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/mnt/MainVolume/Drive/P1RV/build../Box2D_v2.3.0/Box2D -I/mnt/MainVolume/Drive/P1RV/headers 
+CXX_INCLUDES = -I/home/vicco/vicloud/P1RV/build../Box2D_v2.3.0/Box2D -I/home/vicco/vicloud/P1RV/headers 
 

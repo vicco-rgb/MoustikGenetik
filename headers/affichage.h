@@ -14,10 +14,8 @@
 
 using namespace std;
 
-struct Coord;
 GLvoid affichage();
+GLvoid drawQuadrillage(int, int, int, int);
 GLvoid clavier(unsigned char, int, int);
-void clavierUp(unsigned char, int x, int y);
 GLvoid update(int);
 void reshape(GLsizei, GLsizei);
-GLvoid souris(int, int, int, int);

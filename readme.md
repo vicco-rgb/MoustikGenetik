@@ -8,15 +8,15 @@ installer la libraire qui permet de manipuler Box2D
 sudo apt-cache search box2d
 sudo apt-get install libbox2d-dev
 ```
+
 # BUILD
 Une fois la librairie installée :
 ```bash
 cd P1RV/build
 cmake ..
 make
-./main.out
+./exec
 ```
-
 
 # COMMANDES DE JEU
 Appuyer sur 's' pour changer la jambe d'appui.
