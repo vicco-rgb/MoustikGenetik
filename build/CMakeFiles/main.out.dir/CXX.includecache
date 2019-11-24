@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../headers/affichage.h
+OpenGL/gl.h
+-
+GLUT/GLUT.h
+-
+GL/gl.h
+-
+GL/glut.h
+-
+math.h
+-
+vector
+-
+iostream
+-
+physique.h
+../headers/physique.h
+
+../headers/physique.h
+vector
+-
+iostream
+-
+math.h
+-
+Box2D/Box2D.h
+-
+stdio.h
+-
+
+/mnt/MainVolume/Drive/P1RV/src/affichage.cpp
+affichage.h
+/mnt/MainVolume/Drive/P1RV/src/affichage.h
+

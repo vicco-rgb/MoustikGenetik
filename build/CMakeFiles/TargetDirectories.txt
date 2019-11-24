@@ -1,0 +1,3 @@
+/mnt/MainVolume/Drive/P1RV/build/CMakeFiles/rebuild_cache.dir
+/mnt/MainVolume/Drive/P1RV/build/CMakeFiles/main.out.dir
+/mnt/MainVolume/Drive/P1RV/build/CMakeFiles/edit_cache.dir
