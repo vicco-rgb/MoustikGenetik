@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/media/DossierPartage/vicloud/P1RV/Hello/build",
+  "command": "/usr/bin/c++    -g   -o CMakeFiles/HelloWorld.dir/src/HelloWorld.o -c /media/DossierPartage/vicloud/P1RV/Hello/src/HelloWorld.cpp",
+  "file": "/media/DossierPartage/vicloud/P1RV/Hello/src/HelloWorld.cpp"
+}
+]

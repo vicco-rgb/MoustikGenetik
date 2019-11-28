@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/media/DossierPartage/vicloud/P1RV/Hello/src/HelloWorld.cpp
+OpenGL/gl.h
+-
+GLUT/GLUT.h
+-
+GL/gl.h
+-
+GL/glut.h
+-
+cmath
+-
+Box2D/Box2D.h
+-
+stdio.h
+-
+iostream
+-
+

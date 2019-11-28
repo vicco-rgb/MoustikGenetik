@@ -6,11 +6,12 @@ extern unsigned int fps;
 float bodyWidth=0.5f;
 float bodyHeight=0.5f;
 float groundWidth=10.0f;
-float groundHeight=0.5f;
+float groundHeight=0.2f;
 
-b2Body* body;
+b2Body* body; //pointeur vers body
 b2Body* groundBody;
 b2World* ptrWorld;
+
 void BigBang(){
   //DEFINITION MONDE
   b2Vec2 gravity(0.0f, 0.0f);

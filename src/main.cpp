@@ -39,7 +39,7 @@ int main (int argc, char *argv[]){
 	glutDisplayFunc(affichage);
 	glutKeyboardFunc(clavier);
 	glutReshapeFunc(reshape);
-	glutTimerFunc((unsigned int)1000/fps, update, (float)fps);
+	glutTimerFunc((unsigned int)1000/fps, update, 0);
 	currentTime = glutGet(GLUT_ELAPSED_TIME);
 	BigBang();
 	glutMainLoop(); // Lancement de la boucle infinie GLUT

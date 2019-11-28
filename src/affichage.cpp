@@ -35,13 +35,13 @@ GLvoid drawQuadrillage(int x1,int x2, int y1, int y2){
 	for (int j=x1;j<x2;j++){ //verticales
 		glBegin(GL_QUADS);
 		glColor3f(0.2f,0.2f,0.2f);
-		glVertex2f(i-0.05, y2);
+		glVertex2f(j-0.05, y2);
 		glColor3f(0.2f,0.2f,0.2f);
-		glVertex2f(i-0.05, y1);
+		glVertex2f(j-0.05, y1);
 		glColor3f(0.2f,0.2f,0.2f);
-		glVertex2f(i, y1);
+		glVertex2f(j, y1);
 		glColor3f(0.2f,0.2f,0.2f);
-		glVertex2f(i, y2);
+		glVertex2f(j, y2);
 		glEnd();
 		glFlush();
 	}
@@ -70,7 +70,7 @@ GLvoid affichage(){
 	glClear(GL_COLOR_BUFFER_BIT); 	// Effacement du frame buffer
 	drawQuadrillage(-2,5,-2,5);
 
-
+cout<<groundHeight<<endl;
 	glBegin(GL_QUADS); //sol
 	glColor3f(1.0f, 0.5f, 0.5f);
 	glVertex2f(groundBody->GetLocalCenter().x-groundWidth, groundBody->GetLocalCenter().y+groundHeight);
@@ -100,13 +100,22 @@ GLvoid affichage(){
 	glutSwapBuffers();
 }
 GLvoid update(int fps){
-	glutTimerFunc((unsigned int)1000/fps, affichage, (float)fps); // setups the timer to be called again
+	// setups the timer to be called again
+	glutTimerFunc(fps, update, 0);
 	PhysicEngine();
-	previousTime = currentTime;	// Get the time when the previous frame was rendered
-	currentTime = glutGet(GLUT_ELAPSED_TIME);	// Get the current time (in milliseconds)
-	elapsedTime = currentTime - previousTime; //calculate elapsed time
+
+	float32 timeStep = 1.0f / 60.0f;
+	int32 velocityIterations = 6;
+	int32 positionIterations = 2;
+	ptrWorld->Step(timeStep, velocityIterations, positionIterations);
+	// Get the time when the previous frame was rendered
+	previousTime = currentTime;
+
+	// Get the current time (in milliseconds) and calculate the elapsed time
+	currentTime = glutGet(GLUT_ELAPSED_TIME);
+	elapsedTime = currentTime - previousTime;
+	float deplacement = 0.01*elapsedTime;
 	glutPostRedisplay();
-	nTotFrames++;
 }
 GLvoid clavier(unsigned char touche, int x, int y) {
 	// Suivant les touches pressees, nous aurons un comportement different de l'application

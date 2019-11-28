@@ -1,4 +1,6 @@
-.stignore
+build/
+*OLD.cpp
+*OLD.h
 
 ## DEFAULT PAR GITHUB
 # Prerequisites
