@@ -9,7 +9,6 @@
 #include <Box2D/Box2D.h>
 #include <stdio.h>
 #include <iostream>
-#include "hello2.h"
 
 
 unsigned int fps = 60;
