@@ -57,38 +57,38 @@ include CMakeFiles/HelloWorld.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/HelloWorld.dir/flags.make
 
-CMakeFiles/HelloWorld.dir/src/HelloWorld.o: CMakeFiles/HelloWorld.dir/flags.make
-CMakeFiles/HelloWorld.dir/src/HelloWorld.o: ../src/HelloWorld.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/media/DossierPartage/vicloud/P1RV/Hello/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/HelloWorld.dir/src/HelloWorld.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/HelloWorld.dir/src/HelloWorld.o -c /media/DossierPartage/vicloud/P1RV/Hello/src/HelloWorld.cpp
+CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o: CMakeFiles/HelloWorld.dir/flags.make
+CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o: ../src/HelloWorld.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/media/DossierPartage/vicloud/P1RV/Hello/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o -c /media/DossierPartage/vicloud/P1RV/Hello/src/HelloWorld.cpp
 
-CMakeFiles/HelloWorld.dir/src/HelloWorld.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/HelloWorld.dir/src/HelloWorld.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/DossierPartage/vicloud/P1RV/Hello/src/HelloWorld.cpp > CMakeFiles/HelloWorld.dir/src/HelloWorld.i
+CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/DossierPartage/vicloud/P1RV/Hello/src/HelloWorld.cpp > CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.i
 
-CMakeFiles/HelloWorld.dir/src/HelloWorld.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/HelloWorld.dir/src/HelloWorld.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/DossierPartage/vicloud/P1RV/Hello/src/HelloWorld.cpp -o CMakeFiles/HelloWorld.dir/src/HelloWorld.s
+CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/DossierPartage/vicloud/P1RV/Hello/src/HelloWorld.cpp -o CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.s
 
-CMakeFiles/HelloWorld.dir/src/HelloWorld.o.requires:
+CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o.requires:
 
-.PHONY : CMakeFiles/HelloWorld.dir/src/HelloWorld.o.requires
+.PHONY : CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o.requires
 
-CMakeFiles/HelloWorld.dir/src/HelloWorld.o.provides: CMakeFiles/HelloWorld.dir/src/HelloWorld.o.requires
-	$(MAKE) -f CMakeFiles/HelloWorld.dir/build.make CMakeFiles/HelloWorld.dir/src/HelloWorld.o.provides.build
-.PHONY : CMakeFiles/HelloWorld.dir/src/HelloWorld.o.provides
+CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o.provides: CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o.requires
+	$(MAKE) -f CMakeFiles/HelloWorld.dir/build.make CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o.provides.build
+.PHONY : CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o.provides
 
-CMakeFiles/HelloWorld.dir/src/HelloWorld.o.provides.build: CMakeFiles/HelloWorld.dir/src/HelloWorld.o
+CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o.provides.build: CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o
 
 
 # Object files for target HelloWorld
 HelloWorld_OBJECTS = \
-"CMakeFiles/HelloWorld.dir/src/HelloWorld.o"
+"CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o"
 
 # External object files for target HelloWorld
 HelloWorld_EXTERNAL_OBJECTS =
 
-HelloWorld: CMakeFiles/HelloWorld.dir/src/HelloWorld.o
+HelloWorld: CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o
 HelloWorld: CMakeFiles/HelloWorld.dir/build.make
 HelloWorld: /usr/lib/x86_64-linux-gnu/libGL.so
 HelloWorld: /usr/lib/x86_64-linux-gnu/libGLU.so
@@ -104,7 +104,7 @@ CMakeFiles/HelloWorld.dir/build: HelloWorld
 
 .PHONY : CMakeFiles/HelloWorld.dir/build
 
-CMakeFiles/HelloWorld.dir/requires: CMakeFiles/HelloWorld.dir/src/HelloWorld.o.requires
+CMakeFiles/HelloWorld.dir/requires: CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o.requires
 
 .PHONY : CMakeFiles/HelloWorld.dir/requires
 

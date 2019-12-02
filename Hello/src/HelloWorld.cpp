@@ -9,24 +9,72 @@
 #include <Box2D/Box2D.h>
 #include <stdio.h>
 #include <iostream>
+// #include "hello2.cpp"
 
-
-unsigned int fps = 60;
-int previousTime;
-int currentTime;
-int elapsedTime;
-b2World* ptr_World;
-b2Body* body;
-
-// This is a simple example of building and running a simulation
-// using Box2D. Here we create a large ground box and a small dynamic
-// box.
-// There are no graphics for this example. Box2D is meant to be used
-// with your rendering engine in your game engine.
 using namespace std;
+struct Coord {
+	float x;
+	float y;
+};
+class Forme {
+private:
+  b2Body* body;
+  float width;
+  float height;
+  int type; //0, 1 ou 2 = dynamique, statique, kinématique
+  float diag; //demi-diagonale de la boite
+  float angleIn; //angle intérieur = atan(height/width)
+public:
+	Forme(b2World* ptrWorld, Coord pos, float w, float h, int type){
+	  b2BodyDef bodyDef;
 
-int main(int argc, char** argv)
-{
+	  this->type=type;
+		if (type==0){ //dynamique
+			bodyDef.type=b2_dynamicBody;
+		} else if (type==1){
+			bodyDef.type=b2_staticBody;
+		} else if (type==2){
+			bodyDef.type=b2_kinematicBody;
+		}
+		bodyDef.position.Set(pos.x, pos.y);
+
+		body = ptrWorld->CreateBody(&bodyDef);
+		//Box
+		b2PolygonShape collisionBox;
+		collisionBox.SetAsBox(w, h);
+	  //Fixtures
+		b2FixtureDef fixtureDef;
+		fixtureDef.shape = &collisionBox;
+		fixtureDef.density = 1.0f;
+		fixtureDef.friction = 0.3f;
+		body->CreateFixture(&fixtureDef);
+
+	  width=w;
+	  height=h;
+	  diag=sqrt(w*w+h*h);
+	  angleIn=atan(height/width);
+	}
+	Forme(b2World* ptrWorld, Coord pos, int type){
+	  Forme(ptrWorld, pos, 1.0, 1.0, type);
+	}
+	~Forme(){}
+	float getX(){
+		return body->GetPosition().x;
+	}
+	float getY(){
+		return body->GetPosition().y;
+	}
+	float getAngle(){
+		return body->GetAngle();
+	}
+	float getAngleIn(){
+		return angleIn;
+	}
+	float getDiag(){
+		return diag;
+	}
+};
+int main(int argc, char** argv){
 	B2_NOT_USED(argc);
 	B2_NOT_USED(argv);
 	// Define the gravity vector.
@@ -36,11 +84,16 @@ int main(int argc, char** argv)
 	b2World world(gravity);
 	b2World* ptr_World=&world;
 
+	Coord pos;
+	pos.x=0.1;
+	pos.y=1.0;
+	Forme leNewBody(ptr_World, pos, 0.5, 0.5, 0);
+
 	b2BodyDef groundBodyDef;
-	groundBodyDef.position.Set(0.0f, -10.0f);
+	groundBodyDef.position.Set(0.0f, -1.0f);
 	b2Body* groundBody = world.CreateBody(&groundBodyDef);
 	b2PolygonShape groundBox;
-	groundBox.SetAsBox(50.0f, 10.0f);
+	groundBox.SetAsBox(50.0f, 1.0f);
 	groundBody->CreateFixture(&groundBox, 0.0f);
 
 	b2BodyDef bodyDef;	//HEAD
@@ -95,33 +148,59 @@ int main(int argc, char** argv)
 		float b=45;
 		float c=body->GetAngle();
 		glClear(GL_COLOR_BUFFER_BIT); 	// Effacement du frame buffer
-		glBegin(GL_QUADS); //carre
-		glColor3f(0.5f, 0.5f, 0.5f);
-		glVertex2f(body->GetPosition().x-diag*cos(b-c), body->GetPosition().y+diag*sin(b-c));
-		glColor3f(1.0f, 0.5f, 0.5f);
-		glVertex2f(body->GetPosition().x-diag*cos(c+b), body->GetPosition().y-diag*sin(c+b));
-		glColor3f(0.5f, 0.5f, 0.5f);
-		glVertex2f(body->GetPosition().x+diag*cos(b-c), body->GetPosition().y-diag*sin(b-c));
-		glColor3f(0.5f, 0.5f, 0.5f);
-		glVertex2f(body->GetPosition().x+diag*cos(b+c), body->GetPosition().y+diag*sin(b+c));
+		glBegin(GL_QUADS); //GROUND
+		glColor3f(0.87f, 0.72f, 0.64f);
+		glVertex2f(-10,0);
+		glColor3f(0.87f, 0.72f, 0.64f);
+		glVertex2f(-10,-1);
+		glColor3f(0.87f, 0.72f, 0.64f);
+		glVertex2f(10,-1);
+		glColor3f(0.87f, 0.72f, 0.64f);
+		glVertex2f(10,0);
 		glEnd();
 		glFlush();
 
-		diag=sqrt(2)*0.5;
-		b=atan(5);
-		c=body->GetAngle();
-		glBegin(GL_QUADS); //leg
-		glColor3f(0.5f, 0.5f, 0.5f);
-		glVertex2f(leg->GetPosition().x-diag*cos(b-c), leg->GetPosition().y+diag*sin(b-c));
-		glColor3f(0.5f, 0.5f, 0.5f);
-		glVertex2f(leg->GetPosition().x-diag*cos(c+b), leg->GetPosition().y-diag*sin(c+b));
-		glColor3f(0.5f, 0.5f, 0.5f);
-		glVertex2f(leg->GetPosition().x+diag*cos(b-c), leg->GetPosition().y-diag*sin(b-c));
-		glColor3f(0.5f, 1.0f, 0.5f);
-		glVertex2f(leg->GetPosition().x+diag*cos(b+c), leg->GetPosition().y+diag*sin(b+c));
+		// glBegin(GL_QUADS); //carre
+		// glColor3f(0.5f, 0.5f, 0.5f);
+		// glVertex2f(body->GetPosition().x-diag*cos(b-c), body->GetPosition().y+diag*sin(b-c));
+		// glColor3f(1.0f, 0.5f, 0.5f);
+		// glVertex2f(body->GetPosition().x-diag*cos(c+b), body->GetPosition().y-diag*sin(c+b));
+		// glColor3f(0.5f, 0.5f, 0.5f);
+		// glVertex2f(body->GetPosition().x+diag*cos(b-c), body->GetPosition().y-diag*sin(b-c));
+		// glColor3f(0.5f, 0.5f, 0.5f);
+		// glVertex2f(body->GetPosition().x+diag*cos(b+c), body->GetPosition().y+diag*sin(b+c));
+		// glEnd();
+		// glFlush();
+		//
+		// diag=sqrt(2)*0.5;
+		// b=atan(5);
+		// c=body->GetAngle();
+		// glBegin(GL_QUADS); //leg
+		// glColor3f(0.5f, 0.5f, 0.5f);
+		// glVertex2f(leg->GetPosition().x-diag*cos(b-c), leg->GetPosition().y+diag*sin(b-c));
+		// glColor3f(0.5f, 0.5f, 0.5f);
+		// glVertex2f(leg->GetPosition().x-diag*cos(c+b), leg->GetPosition().y-diag*sin(c+b));
+		// glColor3f(0.5f, 0.5f, 0.5f);
+		// glVertex2f(leg->GetPosition().x+diag*cos(b-c), leg->GetPosition().y-diag*sin(b-c));
+		// glColor3f(0.5f, 1.0f, 0.5f);
+		// glVertex2f(leg->GetPosition().x+diag*cos(b+c), leg->GetPosition().y+diag*sin(b+c));
+		// glEnd();
+		// glFlush();
+
+		diag=leNewBody.getDiag();
+		b=leNewBody.getAngleIn();
+		c=leNewBody.getAngle();
+		glBegin(GL_QUADS); //boiteTest
+		glColor3f(0.5f, 0.4f, 0.4f);
+		glVertex2f(leNewBody.getX()-diag*cos(b-c), leNewBody.getY()+diag*sin(b-c));
+		glColor3f(0.4f, 0.4f, 0.4f);
+		glVertex2f(leNewBody.getX()-diag*cos(c+b), leNewBody.getY()-diag*sin(c+b));
+		glColor3f(0.4f, 0.4f, 0.4f);
+		glVertex2f(leNewBody.getX()+diag*cos(b-c), leNewBody.getY()-diag*sin(b-c));
+		glColor3f(0.4f, 1.0f, 0.5f);
+		glVertex2f(leNewBody.getX()+diag*cos(b+c), leNewBody.getY()+diag*sin(b+c));
 		glEnd();
 		glFlush();
-
 
 		glLoadIdentity();
 		gluOrtho2D(-2.0, 4.0, -1.0, 3.0);

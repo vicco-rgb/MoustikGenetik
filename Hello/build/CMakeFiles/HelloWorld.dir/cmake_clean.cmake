@@ -1,5 +1,5 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/HelloWorld.dir/src/HelloWorld.o"
+  "CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o"
   "HelloWorld.pdb"
   "HelloWorld"
 )

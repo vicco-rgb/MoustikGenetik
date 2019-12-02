@@ -123,20 +123,32 @@ HelloWorld/fast:
 	$(MAKE) -f CMakeFiles/HelloWorld.dir/build.make CMakeFiles/HelloWorld.dir/build
 .PHONY : HelloWorld/fast
 
-# target to build an object file
-src/HelloWorld.o:
-	$(MAKE) -f CMakeFiles/HelloWorld.dir/build.make CMakeFiles/HelloWorld.dir/src/HelloWorld.o
+src/HelloWorld.o: src/HelloWorld.cpp.o
+
 .PHONY : src/HelloWorld.o
 
-# target to preprocess a source file
-src/HelloWorld.i:
-	$(MAKE) -f CMakeFiles/HelloWorld.dir/build.make CMakeFiles/HelloWorld.dir/src/HelloWorld.i
+# target to build an object file
+src/HelloWorld.cpp.o:
+	$(MAKE) -f CMakeFiles/HelloWorld.dir/build.make CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o
+.PHONY : src/HelloWorld.cpp.o
+
+src/HelloWorld.i: src/HelloWorld.cpp.i
+
 .PHONY : src/HelloWorld.i
 
-# target to generate assembly for a file
-src/HelloWorld.s:
-	$(MAKE) -f CMakeFiles/HelloWorld.dir/build.make CMakeFiles/HelloWorld.dir/src/HelloWorld.s
+# target to preprocess a source file
+src/HelloWorld.cpp.i:
+	$(MAKE) -f CMakeFiles/HelloWorld.dir/build.make CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.i
+.PHONY : src/HelloWorld.cpp.i
+
+src/HelloWorld.s: src/HelloWorld.cpp.s
+
 .PHONY : src/HelloWorld.s
+
+# target to generate assembly for a file
+src/HelloWorld.cpp.s:
+	$(MAKE) -f CMakeFiles/HelloWorld.dir/build.make CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.s
+.PHONY : src/HelloWorld.cpp.s
 
 # Help Target
 help:
