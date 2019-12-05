@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/mnt/MainVolume/Drive/P1RV/Hello/src/HelloWorld.cpp
+/home/vicco/vicloud/P1RV/Hello/src/HelloWorld.cpp
 OpenGL/gl.h
 -
 GLUT/GLUT.h

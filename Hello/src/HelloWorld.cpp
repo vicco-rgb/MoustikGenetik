@@ -161,9 +161,9 @@ public:
 //commande, getPos, drawOpenGL
 class Moustik {
 private:
-	Forme head;
-	Forme legL;
-	Forme legR;
+	Forme* ptrHead;
+	Forme* ptrLegL;
+	Forme* ptrLegR;
 	b2RevoluteJointDef rotuleL;
 	b2RevoluteJointDef rotuleR;
 	int com;
@@ -171,12 +171,12 @@ public:
 	Moustik(b2World* ptrWorld, Coord pos){
 		com = 0;
 		//définition des formes
-		Forme head(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
-		Forme legL(ptrWorld, pos, 0.05, 0.5, 0); //jambe dynamique de 0.1x1
-		Forme legR(ptrWorld, pos, 0.05, 0.5, 0); //jambe dynamique de 0.1x1
+		ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
+		ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
+		ptrLegR = new Forme(ptrWorld, pos+Coord(0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
 		//définition de la rotuleL et rotuleR
-		rotuleL.Initialize(head.getBody(), legL.getBody(), coord2bvec(head.getHL()));
-		rotuleR.Initialize(head.getBody(), legR.getBody(), coord2bvec(head.getHR()));
+		rotuleL.Initialize(ptrHead->getBody(), ptrLegL->getBody(), coord2bvec(ptrHead->getHL()));
+		rotuleR.Initialize(ptrHead->getBody(), ptrLegR->getBody(), coord2bvec(ptrHead->getHR()));
 		//angles limites rotules
 		float amax=2*M_PI/3;
 		rotuleL.enableLimit = true;
@@ -192,19 +192,26 @@ public:
 	~Moustik(){}
 	void commande(){
 		com=(com+1)%2;
-		// Turn on the motor.
-		//rjd.enableMotor = true;
- 		// How fast is the motor?
-		//rjd.motorSpeed = PI*2;
-		// How powerful is the motor?
+		cout<<com<<endl;
+		if (com==1){
+			rotuleL.enableMotor = true;
+			rotuleL.motorSpeed = M_PI/2;
+			rotuleL.maxMotorTorque = 1000; //how powerful is the motor ?
+			rotuleR.enableMotor = false;
+		} else if (com==2){
+			rotuleR.enableMotor = true;
+			rotuleR.motorSpeed = M_PI/2;
+			rotuleR.maxMotorTorque = 1000; //how powerful is the motor ?
+			rotuleL.enableMotor = false;
+		}
 	}
 	Coord getPos(){
-		return head.getPos();
+		return ptrHead->getPos();
 	}
 	GLvoid drawOpenGL(){
-		head.drawOpenGL();
-		legL.drawOpenGL();
-		legR.drawOpenGL();
+		ptrHead->drawOpenGL();
+		ptrLegL->drawOpenGL();
+		ptrLegR->drawOpenGL();
 	}
 };
 
@@ -213,23 +220,15 @@ public:
 */
 
 b2Vec2 gravity(0.0f, -10.0f);
-b2World world(gravity);
-b2World* ptrWorld=&world;
+b2World* ptrWorld= new b2World(gravity);
 
-//MOUSTIK-----------------------------------------
-Coord pos(0.0,2.0);
-Forme head(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
-Forme legL(ptrWorld, pos, 0.05, 0.5, 0); //jambe dynamique de 0.1x1
-Forme legR(ptrWorld, pos, 0.05, 0.5, 0); //jambe dynamique de 0.1x1
+Moustik cousin(ptrWorld, Coord(0.0,2.0));
 
-//FIN MOUSTIK ----------------------
-
-Coord posGround(0.0,-1.0);
-Forme ground(ptrWorld, posGround, 10.0, 1.0, 1);
-
+Forme ground(ptrWorld, Coord(0.0,-1.0), 10.0, 1.0, 1);
+bool grid=false;
 
 /*
-		FONCTIONS D'AFFICHAGE ######################################################
+		FONCTIONS OPENGL ###########################################################
 */
 
 void reshape(GLsizei width, GLsizei height) {
@@ -280,29 +279,28 @@ GLvoid affichage(){
 	glClear(GL_COLOR_BUFFER_BIT); 	// Effacement du frame buffer
 
 	// cousin.drawOpenGL();
-	head.drawOpenGL();
-	legL.drawOpenGL();
-	legR.drawOpenGL();
+	cousin.drawOpenGL();
 	ground.drawOpenGL();
-	drawQuadrillage(-2,5,-2,5);
-
+	if (grid){
+		drawQuadrillage(-2,5,-2,5);
+	}
 	glLoadIdentity();
 	gluOrtho2D(-2.0, 4.0, -1.0, 3.0);
 	glutSwapBuffers();
 }
 GLvoid update(int fps){
-	glutTimerFunc(fps, update, 0);
-	// Prepare for simulation. Typically we use a time step of 1/60 of a
-	// second (60Hz) and 10 iterations. This provides a high quality simulation
-	// in most game scenarios.
-	ptrWorld->Step(1.0f/30000, 6, 2);
+	int dt=floor(1000/fps); //dt=16ms pour 60fps
+	glutTimerFunc(dt, update, fps);
+	ptrWorld->Step((float32)1/fps, (int32)8, (int32)3);
 	glutPostRedisplay();
 }
 GLvoid clavier(unsigned char touche, int x, int y) {
 	switch(touche) {
 		case 's':
+		cousin.commande();
 		break; //on ne peut commander qu'une seule jambe a la fois.
-		case 'i':
+		case 'g':
+		grid=!grid;
 		break;
 		case 'q' : // quitter
 		case 27 : //escape ou "q"
@@ -318,23 +316,7 @@ GLvoid clavier(unsigned char touche, int x, int y) {
 int main(int argc, char** argv){
 	B2_NOT_USED(argc);
 	B2_NOT_USED(argv);
-
-	//définition de la rotuleL et rotuleR
-	b2RevoluteJointDef* rotuleL = new b2RevoluteJointDef();
-	b2RevoluteJointDef* rotuleR = new b2RevoluteJointDef();
-	rotuleL->Initialize(head.getBody(), legL.getBody(), coord2bvec(head.getHL()));
-	rotuleR->Initialize(head.getBody(), legR.getBody(), coord2bvec(head.getHR()));
-	//angles limites rotules
-	float amax=2*M_PI/3;
-	rotuleL->enableLimit = true;
-	rotuleL->lowerAngle = -amax;
-	rotuleL->upperAngle = amax;
-	rotuleR->enableLimit = true;
-	rotuleR->lowerAngle = -amax;
-	rotuleR->upperAngle = amax;
-	//créer le joint
-	ptrWorld->CreateJoint(rotuleL);
-	ptrWorld->CreateJoint(rotuleR);
+	int fps=60;
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);	// Choix du mode d'affichage (ici RVB)
@@ -347,7 +329,7 @@ int main(int argc, char** argv){
 	glutDisplayFunc(affichage);
 	glutKeyboardFunc(clavier);
 	glutReshapeFunc(reshape);
-	glutTimerFunc((unsigned int)100/6, update, 0);
+	glutTimerFunc(floor(1000/fps), update, fps);
 	glutMainLoop(); // Lancement de la boucle infinie GLUT
 
 	return 0;
