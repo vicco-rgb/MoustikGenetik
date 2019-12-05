@@ -1,7 +1,7 @@
 [
 {
-  "directory": "/media/DossierPartage/vicloud/P1RV/Hello/build",
-  "command": "/usr/bin/c++    -g   -o CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o -c /media/DossierPartage/vicloud/P1RV/Hello/src/HelloWorld.cpp",
-  "file": "/media/DossierPartage/vicloud/P1RV/Hello/src/HelloWorld.cpp"
+  "directory": "/mnt/MainVolume/Drive/P1RV/Hello/build",
+  "command": "/usr/bin/c++    -g   -o CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o -c /mnt/MainVolume/Drive/P1RV/Hello/src/HelloWorld.cpp",
+  "file": "/mnt/MainVolume/Drive/P1RV/Hello/src/HelloWorld.cpp"
 }
 ]

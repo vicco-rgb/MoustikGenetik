@@ -1,4 +1,4 @@
-# Install script for directory: /media/DossierPartage/vicloud/P1RV/Hello
+# Install script for directory: /mnt/MainVolume/Drive/P1RV/Hello
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/media/DossierPartage/vicloud/P1RV/Hello/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/mnt/MainVolume/Drive/P1RV/Hello/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

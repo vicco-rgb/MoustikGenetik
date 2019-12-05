@@ -1,3 +1,3 @@
-/media/DossierPartage/vicloud/P1RV/Hello/build/CMakeFiles/rebuild_cache.dir
-/media/DossierPartage/vicloud/P1RV/Hello/build/CMakeFiles/HelloWorld.dir
-/media/DossierPartage/vicloud/P1RV/Hello/build/CMakeFiles/edit_cache.dir
+/mnt/MainVolume/Drive/P1RV/Hello/build/CMakeFiles/rebuild_cache.dir
+/mnt/MainVolume/Drive/P1RV/Hello/build/CMakeFiles/HelloWorld.dir
+/mnt/MainVolume/Drive/P1RV/Hello/build/CMakeFiles/edit_cache.dir
