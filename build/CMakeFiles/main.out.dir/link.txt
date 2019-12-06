@@ -1,1 +1,0 @@
-/usr/bin/c++  -g  -rdynamic CMakeFiles/main.out.dir/src/affichage.cpp.o CMakeFiles/main.out.dir/src/main.cpp.o CMakeFiles/main.out.dir/src/physique.cpp.o  -o main.out -Wl,-rpath,/usr/local/lib -lGL -lGLU /usr/local/lib/libglut.so -lXmu -lXi -lBox2D 

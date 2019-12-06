@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/home/vicco/vicloud/P1RV/Hello/build",
-  "command": "/usr/bin/c++    -g   -o CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o -c /home/vicco/vicloud/P1RV/Hello/src/HelloWorld.cpp",
-  "file": "/home/vicco/vicloud/P1RV/Hello/src/HelloWorld.cpp"
-}
-]

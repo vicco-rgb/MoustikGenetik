@@ -1,3 +1,0 @@
-/home/vicco/vicloud/P1RV/Hello/build/CMakeFiles/rebuild_cache.dir
-/home/vicco/vicloud/P1RV/Hello/build/CMakeFiles/HelloWorld.dir
-/home/vicco/vicloud/P1RV/Hello/build/CMakeFiles/edit_cache.dir

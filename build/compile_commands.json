@@ -1,17 +1,7 @@
 [
 {
-  "directory": "/media/DossierPartage/vicloud/P1RV/build",
-  "command": "/usr/bin/c++   -I/media/DossierPartage/vicloud/P1RV/build../Box2D_v2.3.0/Box2D -I/media/DossierPartage/vicloud/P1RV/headers  -g   -o CMakeFiles/exec.dir/src/affichage.cpp.o -c /media/DossierPartage/vicloud/P1RV/src/affichage.cpp",
-  "file": "/media/DossierPartage/vicloud/P1RV/src/affichage.cpp"
-},
-{
-  "directory": "/media/DossierPartage/vicloud/P1RV/build",
-  "command": "/usr/bin/c++   -I/media/DossierPartage/vicloud/P1RV/build../Box2D_v2.3.0/Box2D -I/media/DossierPartage/vicloud/P1RV/headers  -g   -o CMakeFiles/exec.dir/src/main.cpp.o -c /media/DossierPartage/vicloud/P1RV/src/main.cpp",
-  "file": "/media/DossierPartage/vicloud/P1RV/src/main.cpp"
-},
-{
-  "directory": "/media/DossierPartage/vicloud/P1RV/build",
-  "command": "/usr/bin/c++   -I/media/DossierPartage/vicloud/P1RV/build../Box2D_v2.3.0/Box2D -I/media/DossierPartage/vicloud/P1RV/headers  -g   -o CMakeFiles/exec.dir/src/physique.cpp.o -c /media/DossierPartage/vicloud/P1RV/src/physique.cpp",
-  "file": "/media/DossierPartage/vicloud/P1RV/src/physique.cpp"
+  "directory": "/home/vicco/vicloud/P1RV/Hello/build",
+  "command": "/usr/bin/c++    -g   -o CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o -c /home/vicco/vicloud/P1RV/Hello/src/HelloWorld.cpp",
+  "file": "/home/vicco/vicloud/P1RV/Hello/src/HelloWorld.cpp"
 }
 ]

@@ -1,1 +1,0 @@
-/usr/bin/c++  -g  -rdynamic CMakeFiles/exec.dir/src/affichage.cpp.o CMakeFiles/exec.dir/src/main.cpp.o CMakeFiles/exec.dir/src/physique.cpp.o  -o exec -lGL -lGLU -lglut -lXmu -lXi -lBox2D 
