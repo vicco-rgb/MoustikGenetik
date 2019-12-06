@@ -4,13 +4,11 @@ TEST
 */
 
 Population testInit(){
-  cout<<"TI1"<<endl;
   srand(time(NULL));
   vector<int> seq1 {1,20,50,60,70};
   vector<int> seq2 {3,60,80,10,40};
   vector<int> seq3 {1,10,100,40,20};
   vector<int> seq4 {30,40,20,90,500};
-  cout<<"TI2"<<endl;
 
   Genome *s1 = new Genome(seq1);
   Genome *s2 = new Genome(seq2);
@@ -22,9 +20,7 @@ Population testInit(){
   listGenomes.push_back(s2);
   listGenomes.push_back(s3);
   listGenomes.push_back(s4);
-  cout<<"TI3"<<endl;
   Population pop(listGenomes,0);
-  cout<<"TI4"<<endl;
   return pop;
 }
 
@@ -89,17 +85,14 @@ Genome* Genome::cross(Genome* genome){
   //cette fonction produit un enfant génome à partir de deux parents
   Genome *fils = new Genome();
   int prop = rand()%seq.size(); //prop in [0 taillegenome]
-  cout<<"CR1"<<endl;
   for (int i=0;i<prop;i++){
     //on recopie les prop premières dates du père
     fils->seq[i]=seq[i];
   }
-  cout<<"CR2"<<endl;
   for (int j=prop;j<seq.size();j++){
     //on recopie les seqSize-prop dernières dates de la mère
     fils->seq[j]=genome->seq[j];
   }
-  cout<<"CR3"<<endl;
   fils->fitness=0;
   return fils;
 }
@@ -151,13 +144,10 @@ int Population::getGeneration(){
 Population Population::bests(int n){
   int best=0;
   //on trie toute la liste des genomes selon leur fitness
-  cout<<"BE1"<<endl;
   for(int i=0;i<genomes.size()-1;i++){
-    cout<<"BE"<<i<<endl;
     Genome *tmp = new Genome();
     best=i;
     for(int j=i+1;j<genomes.size();j++){
-      cout<<"BE"<<i<<"-"<<j<<endl;
       if (genomes[j]->betterThan(genomes[best])){
         best=j;
       }
@@ -177,21 +167,16 @@ Population Population::bests(int n){
 }
 Population Population::reproduction(Population pop){
   int size=pop.getGenomes().size();
-  cout<<"RE1"<<endl;
   vector<Genome*> childGenomes = pop.getGenomes();
-  cout<<"RE2"<<endl;
   for (int i=0;i<size;i++){
     //on cherche un papa et une maman pour l'enfant.
-    cout<<"REi - "<<i<<endl;
     int dad=rand()%size;
     int mom=rand()%size;
     while (dad==mom){ //first et second doivent être différents.
-      cout<<"REequal"<<endl;
       mom=rand()%size;
     }
     childGenomes[i]=pop.getGenomes()[dad]->cross(pop.getGenomes()[mom]);
   }
-  cout<<"RE3"<<endl;
   return Population(childGenomes, pop.getGeneration());
 }
 Population Population::mutateGroup(Population pop){
@@ -204,18 +189,12 @@ Population Population::mutateGroup(Population pop){
 Population Population::getChildren(int n){
   //cette fonction renvoie une population correspondant aux enfants issus des nmeilleurs parents de la population manipulée.
   //La population manipulée n'est pas écrasée
-  cout<<"GC1"<<endl;
   Population bestPop = bests(n); //les trouve les n meilleurs parents
-  cout<<"GC2"<<endl;
   Population newGeneration = reproduction(bestPop); //on récupère les n enfants
-  cout<<"GC3"<<endl;
-
   while (newGeneration.getGenomes().size()<genomes.size()){
     //on recrée une population de la taille originale en complétant parmis les meilleurs parents.
     newGeneration.addGenome(bestPop.getGenomes()[rand()%n]);
   }
-  cout<<"GC4"<<endl;
   newGeneration = mutateGroup(newGeneration); // on les fait muter
-  cout<<"GC5"<<endl;
   return newGeneration;
 }

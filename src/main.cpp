@@ -416,7 +416,7 @@ Forme ground(ptrWorld, Coord(0.0,-1.0), 10.0, 1.0, 1);
 int nFrame=0;
 //IAWORLD
 b2World* ptrWorldIAs= new b2World(b2Vec2(0.0f,-9.81f));
-vector<int> seq {120, 120, 120, 120};
+vector<int> seq {1,20,50,60,70};
 Genome genome(seq);
 MoustikIA cousinIA(ptrWorldIAs, Coord(0.0,3.0), genome, 0);
 Forme groundIAs(ptrWorldIAs, Coord(0.0,-1.0), 10.0, 1.0, 1);
@@ -536,14 +536,6 @@ int main(int argc, char** argv){
 	B2_NOT_USED(argc);
 	B2_NOT_USED(argv);
 	int fps=60;
-
-	cout<<cousinIA.getSeq()<<endl;
-	// Population popInit = testInit();
-	// cout<<"MA1"<<endl;
-	// Population children = popInit.getChildren(3);
-	// cout<<"MA2"<<endl;
-	// cout<<popInit<<endl<<"####### CHILDREN ##########"<<endl;
-  // cout<<children;
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);	// Choix du mode d'affichage (ici RVB)
