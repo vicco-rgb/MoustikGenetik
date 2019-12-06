@@ -1,24 +1,8 @@
-//
-//  genome.cpp
-//  ds2
-//
-//  Created by Chloe1 Leric on 11/5/19.
-//  Copyright © 2019 Chloe1 Leric. All rights reserved.
-//
-
 #include "genome.hpp"
-#include <stdio.h>
-#include <vector>
-#include <cmath>
-#include <ctime>
-#include <iostream>
-
-using namespace std;
 
 population::population(vector<genome*> pop){
     this->pop=pop;
 }
-
 vector<genome*> population::best(int n){
     int best=0;
     for(int i=0;i<pop.size()-1;i++){
@@ -41,7 +25,6 @@ vector<genome*> population::best(int n){
     }
     return popBest;
 }
-
 vector<genome*> population::reproduction(vector<genome*> pop, int n){
     vector<genome*> popCrossed = pop;
     for (int i=0;i<n;i++){
@@ -54,7 +37,6 @@ vector<genome*> population::reproduction(vector<genome*> pop, int n){
     }
     return popCrossed;
 }
-
 vector<genome*> population::mutateGroup(vector<genome*> pop){
     vector<genome*> popMutated = pop;
     for (int i=0; i<pop.size();i++){
@@ -62,7 +44,6 @@ vector<genome*> population::mutateGroup(vector<genome*> pop){
     }
     return popMutated;
 }
-
 vector<genome*> population::generation(int m){
     vector<genome*> newGeneration;
     vector<genome*> bestPop;
@@ -73,7 +54,6 @@ vector<genome*> population::generation(int m){
     affichageVec(newGeneration);
     return newGeneration;
 }
-
 void population::affichage(){
     for (int i=0;i<pop.size();i++){
         cout<<"{";
@@ -85,15 +65,16 @@ void population::affichage(){
     cout<<endl;
 }
 
-void affichageVec(vector<genome*> pop){
-    for (int i=0;i<pop.size();i++){
-        cout<<"{";
-        for (int j=0; j<pop[i]->getSeq().size();j++){
-            cout<<pop[i]->getSeq()[j]<< ",";
-        }
-        cout<<"}"<<pop[i]->getFitness()<<endl;
-    }
-    cout<<endl;
+ostream& operator<<(ostream& os, const vector<genome*> pop){
+  for (int i=0;i<pop.size();i++){
+      cout<<"{";
+      for (int j=0; j<pop[i]->getSeq().size();j++){
+          cout<<pop[i]->getSeq()[j]<< ",";
+      }
+      cout<<"}"<<pop[i]->getFitness()<<endl;
+  }
+  cout<<endl;
+  return os;
 }
 
 genome::genome(vector<int> seq) : totMutation(0.3) {
@@ -103,7 +84,6 @@ genome::genome(vector<int> seq) : totMutation(0.3) {
         fitness+=seq[i];
     }
 }
-
 genome::genome() : totMutation(0.3) {
     seq={0,0,0,0,0};
     fitness=0;
@@ -111,15 +91,12 @@ genome::genome() : totMutation(0.3) {
         fitness+=seq[i];
     }
 }
-
 vector<int> genome::getSeq(){
     return seq;
 }
-
 int genome::getFitness(){
     return fitness;
 }
-
 genome* genome::cross(genome* s2){
     genome *fils = new genome();
     int n = rand()%seq.size();
@@ -135,7 +112,6 @@ genome* genome::cross(genome* s2){
     }
     return fils;
 }
-
 genome* genome::mutation(){
     genome *mutated = new genome();
     int n = rand()%100;
@@ -149,9 +125,7 @@ genome* genome::mutation(){
     }
     return mutated;
 }
-
 int genome::compare(genome* s1){
     int diff = fitness-s1->fitness;
     return diff;
 }
-
