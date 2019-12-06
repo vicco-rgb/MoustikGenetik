@@ -9,8 +9,9 @@
 #include <Box2D/Box2D.h>
 #include <stdio.h>
 #include <iostream>
-#include <ofstream>
+#include <fstream>
 #include <vector>
+#include <algorithm>
 #include "genome.hpp"
 using namespace std;
 
@@ -184,7 +185,7 @@ public:
 //head, legL, legR, rotuleL, rotuleR, com
 //commande, getPos, undertaker, updateScore, reset, getAbs, isIA, drawOpenGL
 class Moustik {
-private:
+protected:
 	Forme* ptrHead;
 	Forme* ptrLegL;
 	Forme* ptrLegR;
@@ -256,7 +257,7 @@ public:
 	Coord getPos(){
 		return ptrHead->getPos();
 	}
-	void undertaker(){
+	virtual void undertaker(){
 		//permet de tester si le moustik et mort
 		float limit=2e-2;
 		if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
@@ -264,8 +265,13 @@ public:
 			ptrHead->getBody()->SetActive(false);
 			ptrLegL->getBody()->SetActive(false);
 			ptrLegR->getBody()->SetActive(false);
-
-			// A FAIRE : écrire la séquence dans un fichier texte.
+			//on écrit la séquence de jeu dans un fichier texte.
+			ofstream outfile;
+	    outfile.open("mySequence.txt");
+			for (int i=0;i<sequence.size();i++){
+					outfile<<sequence[i]<<"-";
+			}
+			outfile.close();
 		}
 	}
 	void updateScore(){
@@ -307,7 +313,7 @@ public:
 	float getAbs(){
 		return ptrHead->getPos().x;
 	}
-	bool isIA(){
+	string type(){
 		return controlType;
 	}
 	GLvoid drawOpenGL(){
@@ -333,18 +339,37 @@ public:
 //ptrGenome
 //play
 class MoustikIA : public Moustik {
-private:
+protected:
 	Genome* ptrGenome;
+	int id;
 public:
 	MoustikIA(b2World* ptrWorld, Coord pos, Genome genome) : Moustik(ptrWorld, pos){
 		controlType="IA";
 		ptrGenome=&genome;
 	}
-	void play(int nFrame){
+	void play(b2World* ptrWorld, int nFrame){
 		//fonction appelée a toutes les frames
 		vector<int> seq=ptrGenome->getSeq();
-		if (count(0, seq.size(), nFrame)==1){
-			commande();
+		if (count(seq.begin(), seq.end(), nFrame)==1){
+			commande(ptrWorld, nFrame);
+		}
+	}
+	virtual void undertaker(){
+		//permet de tester si le moustik et mort
+		float limit=2e-2;
+		if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
+			dead=true;
+			ptrHead->getBody()->SetActive(false);
+			ptrLegL->getBody()->SetActive(false);
+			ptrLegR->getBody()->SetActive(false);
+			//on écrit la séquence de jeu dans un fichier texte.
+			ofstream outfile;
+			string filename="seqIA-"+string(id)+".txt";
+			outfile.open(filename);
+			for (int i=0;i<sequence.size();i++){
+					outfile<<sequence[i]<<"-";
+			}
+			outfile.close();
 		}
 	}
 }
@@ -352,8 +377,7 @@ public:
 		VARIABLES GLOBALES #########################################################
 */
 
-b2Vec2 gravity(0.0f, -10.0f);
-b2World* ptrWorld= new b2World(gravity);
+b2World* ptrWorld= new b2World(b2Vec2(0.0f,-9.81f));
 
 Moustik cousin(ptrWorld, Coord(0.0,2.0));
 
