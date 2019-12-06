@@ -112,7 +112,9 @@ public:
 	Forme(b2World* ptrWorld, Coord pos, int type){
 	  Forme(ptrWorld, pos, 1.0, 1.0, type);
 	}
-	~Forme(){}
+	~Forme(){
+		body->GetWorld()->DestroyBody( body );
+	}
 	float getX(){
 		return body->GetPosition().x;
 	}
@@ -177,7 +179,7 @@ public:
 	}
 };
 //head, legL, legR, rotuleL, rotuleR, com
-//commande, getPos, undertaker, score, drawOpenGL
+//commande, getPos, undertaker, updateScore, drawOpenGL
 class Moustik {
 private:
 	Forme* ptrHead;
@@ -188,11 +190,13 @@ private:
 	int com;
 	bool dead;
 	float score;
+	float angleMax;
 public:
 	Moustik(b2World* ptrWorld, Coord pos){
 		com = 0;
 		dead=false;
 		score=0.0;
+		angleMax = 5*M_PI/6;
 		//définition des formes
 		ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
 		ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
@@ -206,15 +210,14 @@ public:
 		defRotuleL.collideConnected = false;
 		defRotuleR.collideConnected = false;
 		//angles limites rotules
-		float amax=2*M_PI/3;
 		defRotuleL.enableMotor = false;
 		defRotuleR.enableMotor = false;
 		defRotuleL.enableLimit = true;
-		defRotuleL.lowerAngle = -amax;
-		defRotuleL.upperAngle = amax;
+		defRotuleL.lowerAngle = -angleMax;
+		defRotuleL.upperAngle = angleMax;
 		defRotuleR.enableLimit = true;
-		defRotuleR.lowerAngle = -amax;
-		defRotuleR.upperAngle = amax;
+		defRotuleR.lowerAngle = -angleMax;
+		defRotuleR.upperAngle = angleMax;
 		//créer le joint
 		rotuleL = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defRotuleL );
 		rotuleR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defRotuleR );
@@ -227,14 +230,18 @@ public:
 			rotuleR->EnableMotor(false);
 		}	else if (com==1){
 			rotuleL->EnableMotor(true);
-  		rotuleL->SetMotorSpeed(M_PI);
-  		rotuleL->SetMaxMotorTorque(10);
+  		rotuleL->SetMotorSpeed(M_PI/2); //1/4 de tour par seconde
+  		rotuleL->SetMaxMotorTorque(100);
 			rotuleR->EnableMotor(false);
+  		rotuleR->SetMotorSpeed(0);
+  		rotuleR->SetMaxMotorTorque(0);
 		} else if (com==2){
 			rotuleR->EnableMotor(true);
-  		rotuleR->SetMotorSpeed(M_PI);
-  		rotuleR->SetMaxMotorTorque(10);
+  		rotuleR->SetMotorSpeed(M_PI/2);
+  		rotuleR->SetMaxMotorTorque(100);
 			rotuleL->EnableMotor(false);
+  		rotuleL->SetMotorSpeed(0);
+  		rotuleL->SetMaxMotorTorque(0);
 		}
 	}
 	Coord getPos(){
@@ -242,13 +249,46 @@ public:
 	}
 	void undertaker(){
 		//permet de tester si le moustik et mort
-		float limit=6e-2;
-		if (ptrHead->getHL().y < 6e-2| ptrHead->getHR().y < 6e-2| ptrHead->getTL().y < 6e-2| ptrHead->getTR().y < 6e-2){
+		float limit=1e-2;
+		if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
 			dead=true;
 		}
 	}
-	void setScore(){
-		score=max(ptrHead->getPos().x,score);
+	void updateScore(){
+		score=max(ptrHead->getPos().x, score);
+	}
+	void reset(b2World* ptrWorld){
+		delete ptrHead;
+		delete ptrLegL;
+		delete ptrLegR;
+		//cette fonction ressemble au constructeur mais ne réinitialise pas le score, ni angleMax.
+		com = 0;
+		dead = false;
+		//definition of bodies
+		Coord pos(0, 2);
+		ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
+		ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
+		ptrLegR = new Forme(ptrWorld, pos+Coord(0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
+		//définition de la rotuleL et rotuleR
+		b2RevoluteJointDef defRotuleL;
+		b2RevoluteJointDef defRotuleR;
+		defRotuleL.Initialize(ptrHead->getBody(), ptrLegL->getBody(), coord2bvec(ptrHead->getHL()));
+		defRotuleR.Initialize(ptrHead->getBody(), ptrLegR->getBody(), coord2bvec(ptrHead->getHR()));
+		//les jambes passent a travers la tête.
+		defRotuleL.collideConnected = false;
+		defRotuleR.collideConnected = false;
+		//angles limites rotules
+		defRotuleL.enableMotor = false;
+		defRotuleR.enableMotor = false;
+		defRotuleL.enableLimit = true;
+		defRotuleL.lowerAngle = -angleMax;
+		defRotuleL.upperAngle = angleMax;
+		defRotuleR.enableLimit = true;
+		defRotuleR.lowerAngle = -angleMax;
+		defRotuleR.upperAngle = angleMax;
+		//créer le joint
+		rotuleL = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defRotuleL );
+		rotuleR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defRotuleR );
 	}
 	GLvoid drawOpenGL(){
 		if (dead) { //si mort, il devient rouge
@@ -350,7 +390,7 @@ GLvoid update(int fps){
 
 	ptrWorld->Step((float32)1/fps, (int32)8, (int32)3);
 	cousin.undertaker(); //est-ce que il est mort ?
-	cousin.setScore();
+	cousin.updateScore();
 
 	glutPostRedisplay();
 }
@@ -361,6 +401,9 @@ GLvoid clavier(unsigned char touche, int x, int y) {
 		break; //on ne peut commander qu'une seule jambe a la fois.
 		case 'g':
 		grid=!grid;
+		break;
+		case 'i':
+		cousin.reset(ptrWorld);
 		break;
 		case 'q' : // quitter
 		case 27 : //escape ou "q"
