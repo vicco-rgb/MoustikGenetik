@@ -179,7 +179,7 @@ public:
 	}
 };
 //head, legL, legR, rotuleL, rotuleR, com
-//commande, getPos, undertaker, updateScore, drawOpenGL
+//commande, getPos, undertaker, updateScore, reset, drawOpenGL
 class Moustik {
 private:
 	Forme* ptrHead;
@@ -225,23 +225,25 @@ public:
 	~Moustik(){}
 	void commande(b2World* ptrWorld){
 		com=1+com%2;
+		float minTorque=5;
+		float maxTorque=50;
 		if (dead) { //on tue tout.
 			rotuleL->EnableMotor(false);
 			rotuleR->EnableMotor(false);
 		}	else if (com==1){
 			rotuleL->EnableMotor(true);
   		rotuleL->SetMotorSpeed(M_PI/2); //1/4 de tour par seconde
-  		rotuleL->SetMaxMotorTorque(100);
-			rotuleR->EnableMotor(false);
-  		rotuleR->SetMotorSpeed(0);
-  		rotuleR->SetMaxMotorTorque(0);
+  		rotuleL->SetMaxMotorTorque(maxTorque);
+			rotuleR->EnableMotor(true);
+  		rotuleR->SetMotorSpeed(-M_PI/2);
+  		rotuleR->SetMaxMotorTorque(minTorque);
 		} else if (com==2){
 			rotuleR->EnableMotor(true);
   		rotuleR->SetMotorSpeed(M_PI/2);
-  		rotuleR->SetMaxMotorTorque(100);
-			rotuleL->EnableMotor(false);
-  		rotuleL->SetMotorSpeed(0);
-  		rotuleL->SetMaxMotorTorque(0);
+  		rotuleR->SetMaxMotorTorque(maxTorque);
+			rotuleL->EnableMotor(true);
+  		rotuleL->SetMotorSpeed(-M_PI/2);
+  		rotuleL->SetMaxMotorTorque(minTorque);
 		}
 	}
 	Coord getPos(){
@@ -249,9 +251,12 @@ public:
 	}
 	void undertaker(){
 		//permet de tester si le moustik et mort
-		float limit=1e-2;
+		float limit=2e-2;
 		if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
 			dead=true;
+			ptrHead->getBody()->SetActive(false);
+			ptrLegL->getBody()->SetActive(false);
+			ptrLegR->getBody()->SetActive(false);
 		}
 	}
 	void updateScore(){
