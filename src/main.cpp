@@ -240,8 +240,12 @@ public:
 		//motorisation rotules.
 		defhipL.enableMotor = false;
 		defhipR.enableMotor = false;
-		defkneeL.enableMotor = false;
-		defkneeR.enableMotor = false;
+		defkneeL.enableMotor = true;
+		defkneeR.enableMotor = true;
+		defkneeL.motorSpeed = M_PI/10;
+		defkneeR.maxMotorTorque = 1;
+		defkneeL.motorSpeed = M_PI/10;
+		defkneeR.maxMotorTorque = 1;
 		//créer le joint
 		hipL = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defhipL );
 		hipR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defhipR );
@@ -251,7 +255,7 @@ public:
 	~Moustik(){}
 	void commande(b2World* ptrWorld){
 		com=1+com%2;
-		float minTorque=5;
+		float minTorque=50;
 		float maxTorque=50;
 		if (dead) { //on tue tout.
 			hipL->EnableMotor(false);
@@ -261,14 +265,14 @@ public:
   		hipL->SetMotorSpeed(M_PI/2); //1/4 de tour par seconde
   		hipL->SetMaxMotorTorque(maxTorque);
 			hipR->EnableMotor(true);
-  		hipR->SetMotorSpeed(-M_PI/2);
+  		hipR->SetMotorSpeed(-M_PI/4);
   		hipR->SetMaxMotorTorque(minTorque);
 		} else if (com==2){
 			hipR->EnableMotor(true);
   		hipR->SetMotorSpeed(M_PI/2);
   		hipR->SetMaxMotorTorque(maxTorque);
 			hipL->EnableMotor(true);
-  		hipL->SetMotorSpeed(-M_PI/2);
+  		hipL->SetMotorSpeed(-M_PI/4);
   		hipL->SetMaxMotorTorque(minTorque);
 		}
 	}
@@ -279,10 +283,15 @@ public:
 		//permet de tester si le moustik et mort
 		float limit=2e-2;
 		if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
+			if (!dead) {//si le moustik viens de mourir
+				cout<<"you are dead, press 'i' to restart. Your score : "<<score<<endl;
+			}
 			dead=true;
 			ptrHead->getBody()->SetActive(false);
 			ptrThighL->getBody()->SetActive(false);
 			ptrThighR->getBody()->SetActive(false);
+			ptrTibiaL->getBody()->SetActive(false);
+			ptrTibiaR->getBody()->SetActive(false);
 		}
 	}
 	void updateScore(){
@@ -328,13 +337,20 @@ public:
 		//motorisation rotules
 		defhipL.enableMotor = false;
 		defhipR.enableMotor = false;
-		defkneeL.enableMotor = false;
-		defkneeR.enableMotor = false;
+		defkneeL.enableMotor = true;
+		defkneeR.enableMotor = true;
+		defkneeL.motorSpeed = -M_PI/10;
+		defkneeR.maxMotorTorque = 1;
+		defkneeL.motorSpeed = -M_PI/10;
+		defkneeR.maxMotorTorque = 1;
 		//créer le joint
 		hipL = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defhipL );
 		hipR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defhipR );
 		kneeL = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defkneeL );
 		kneeR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defkneeR );
+	}
+	float getAbs(){
+		return ptrHead->getPos().x;
 	}
 	GLvoid drawOpenGL(){
 		if (dead) { //si mort, il devient rouge
@@ -388,9 +404,9 @@ void reshape(GLsizei width, GLsizei height) {
 	glMatrixMode(GL_PROJECTION);  // To operate on the Projection matrix
 	glLoadIdentity();             // Reset the projection matrix
 	if (width >= height) { //ordre : left, right, bottom, top
-		gluOrtho2D(-2.0* aspect, 4.0 * aspect, -1.0, 5.0); // aspect >= 1, set the height from -1 to 1, with larger width
+		gluOrtho2D(cousin.getAbs()-2.0* aspect, cousin.getAbs()+4.0 * aspect, -1.0, 5.0); // aspect >= 1, set the height from -1 to 1, with larger width
 	} else {
-		gluOrtho2D(-2.0, 4.0, -1.0 / aspect, 5.0 / aspect);// aspect < 1, set the width to -1 to 1, with larger height
+		gluOrtho2D(cousin.getAbs()-2.0, cousin.getAbs()+4.0, -1.0 / aspect, 5.0 / aspect);// aspect < 1, set the width to -1 to 1, with larger height
 	}
 }
 GLvoid drawQuadrillage(int x1,int x2, int y1, int y2){
@@ -431,7 +447,7 @@ GLvoid affichage(){
 		drawQuadrillage(-2,5,-2,5);
 	}
 	glLoadIdentity();
-	gluOrtho2D(-2.0, 4.0, -1.0, 3.0);
+	gluOrtho2D(cousin.getAbs()-2.0, cousin.getAbs()+4.0, -1.0, 3.0);
 	glutSwapBuffers();
 }
 GLvoid update(int fps){
