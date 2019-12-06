@@ -9,6 +9,7 @@
 #include <Box2D/Box2D.h>
 #include <stdio.h>
 #include <iostream>
+#include "genome.hpp"
 using namespace std;
 
 /*
@@ -179,7 +180,7 @@ public:
 	}
 };
 //head, legL, legR, rotuleL, rotuleR, com
-//commande, getPos, undertaker, updateScore, reset, drawOpenGL
+//commande, getPos, undertaker, updateScore, reset, getAbs, drawOpenGL
 class Moustik {
 private:
 	Forme* ptrHead;
@@ -295,6 +296,9 @@ public:
 		rotuleL = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defRotuleL );
 		rotuleR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defRotuleR );
 	}
+	float getAbs(){
+		return ptrHead->getPos().x;
+	}
 	GLvoid drawOpenGL(){
 		if (dead) { //si mort, il devient rouge
 			ptrHead->drawOpenGL(1.0f, 0.7f, 0.7f);
@@ -343,9 +347,9 @@ void reshape(GLsizei width, GLsizei height) {
 	glMatrixMode(GL_PROJECTION);  // To operate on the Projection matrix
 	glLoadIdentity();             // Reset the projection matrix
 	if (width >= height) { //ordre : left, right, bottom, top
-		gluOrtho2D(-2.0* aspect, 4.0 * aspect, -1.0, 5.0); // aspect >= 1, set the height from -1 to 1, with larger width
+		gluOrtho2D(cousin.getAbs()-2.0* aspect, cousin.getAbs()+4.0 * aspect, -1.0, 5.0); // aspect >= 1, set the height from -1 to 1, with larger width
 	} else {
-		gluOrtho2D(-2.0, 4.0, -1.0 / aspect, 5.0 / aspect);// aspect < 1, set the width to -1 to 1, with larger height
+		gluOrtho2D(cousin.getAbs()-2.0, cousin.getAbs()+4.0, -1.0 / aspect, 5.0 / aspect);// aspect < 1, set the width to -1 to 1, with larger height
 	}
 }
 GLvoid drawQuadrillage(int x1,int x2, int y1, int y2){
@@ -383,10 +387,10 @@ GLvoid affichage(){
 	cousin.drawOpenGL();
 	ground.drawOpenGL();
 	if (grid){
-		drawQuadrillage(-2,5,-2,5);
+		drawQuadrillage(floor(cousin.getAbs())-2,floor(cousin.getAbs())+5,-2,3);
 	}
 	glLoadIdentity();
-	gluOrtho2D(-2.0, 4.0, -1.0, 3.0);
+	gluOrtho2D(cousin.getAbs()-2.0, cousin.getAbs()+4.0, -1.0, 3.0);
 	glutSwapBuffers();
 }
 GLvoid update(int fps){

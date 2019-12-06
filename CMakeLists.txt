@@ -9,7 +9,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_FLAGS "-g") #permet de chopper des informations pour débugger.
 
 include_directories(${Box2D_SOURCE_DIR})
-# include_directories(headers)
-add_executable(exec src/main.cpp)
+include_directories(headers)
+file(GLOB SRCS src/*.cpp)
+add_executable(exec ${SRCS})
 
 target_link_libraries (exec Box2D ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})

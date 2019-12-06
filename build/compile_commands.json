@@ -1,7 +1,12 @@
 [
 {
-  "directory": "/home/vicco/vicloud/P1RV/Hello/build",
-  "command": "/usr/bin/c++    -g   -o CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o -c /home/vicco/vicloud/P1RV/Hello/src/HelloWorld.cpp",
-  "file": "/home/vicco/vicloud/P1RV/Hello/src/HelloWorld.cpp"
+  "directory": "/home/vicco/vicloud/P1RV/build",
+  "command": "/usr/bin/c++   -I/home/vicco/vicloud/P1RV/headers  -g   -o CMakeFiles/exec.dir/src/genome.cpp.o -c /home/vicco/vicloud/P1RV/src/genome.cpp",
+  "file": "/home/vicco/vicloud/P1RV/src/genome.cpp"
+},
+{
+  "directory": "/home/vicco/vicloud/P1RV/build",
+  "command": "/usr/bin/c++   -I/home/vicco/vicloud/P1RV/headers  -g   -o CMakeFiles/exec.dir/src/main.cpp.o -c /home/vicco/vicloud/P1RV/src/main.cpp",
+  "file": "/home/vicco/vicloud/P1RV/src/main.cpp"
 }
 ]
