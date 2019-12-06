@@ -1,7 +1,7 @@
 [
 {
   "directory": "/home/vicco/vicloud/P1RV/build",
-  "command": "/usr/bin/c++    -g   -o CMakeFiles/exec.dir/src/main.cpp.o -c /home/vicco/vicloud/P1RV/src/main.cpp",
+  "command": "/usr/bin/c++   -I/home/vicco/vicloud/P1RV/lib/Boxs2D  -g   -o CMakeFiles/exec.dir/src/main.cpp.o -c /home/vicco/vicloud/P1RV/src/main.cpp",
   "file": "/home/vicco/vicloud/P1RV/src/main.cpp"
 }
 ]

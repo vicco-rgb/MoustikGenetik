@@ -14,9 +14,6 @@
 # EXTERNAL cache entries
 ########################
 
-//The directory containing a CMake configuration file for Box2D.
-Box2D_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/Box2D
-
 //Path to a program.
 CMAKE_AR:FILEPATH=/usr/bin/ar
 
