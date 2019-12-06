@@ -65,7 +65,7 @@ b2Vec2 coord2bvec(Coord pos){
 }
 
 //body, width, height, type, diag, angleIn
-//getX, getY, getPos, getBody, getAngle, getAngleIn, getDiag, getHL, getHR drawOpenGL
+//getX, getY, getPos, getBody, getAngle, getAngleIn, getDiag, getHL, getHR, getTL, getTR, drawOpenGLx2
 class Forme {
 private:
   b2Body* body;
@@ -136,14 +136,19 @@ public:
 		return diag;
 	}
 	Coord getHL(){
-		Coord pos(getX()-diag*cos(getAngle()+angleIn), getY()-diag*sin(getAngle()+angleIn));
-		return pos;
+		return Coord(getX()-diag*cos(getAngle()+angleIn), getY()-diag*sin(getAngle()+angleIn));
 	}
 	Coord getHR(){
-		Coord pos(getX()+diag*cos(angleIn-getAngle()), getY()-diag*sin(angleIn-getAngle()));
-		return pos;
+		return Coord(getX()+diag*cos(angleIn-getAngle()), getY()-diag*sin(angleIn-getAngle()));
+	}
+	Coord getTL(){
+		return Coord(getX()-diag*cos(angleIn-getAngle()), getY()+diag*sin(angleIn-getAngle()));
+	}
+	Coord getTR(){
+		return Coord(getX()+diag*cos(angleIn+getAngle()), getY()+diag*sin(angleIn+getAngle()));
 	}
 	GLvoid drawOpenGL(){
+		//dessine le rectangle dans une couleur blanc pale par défaut
 		glBegin(GL_QUADS);
 		glColor3f(1.0f, 0.9f, 0.8f);
 		glVertex2f(getX()-diag*cos(angleIn-getAngle()), getY()+diag*sin(angleIn-getAngle()));
@@ -156,62 +161,113 @@ public:
 		glEnd();
 		glFlush();
 	}
+	GLvoid drawOpenGL(float r, float g, float b){
+		//on peut définir ici la couleur d'affichage de la forme
+		glBegin(GL_QUADS);
+		glColor3f(r, g, b);
+		glVertex2f(getX()-diag*cos(angleIn-getAngle()), getY()+diag*sin(angleIn-getAngle()));
+		glColor3f(r, g, b);
+		glVertex2f(getX()-diag*cos(getAngle()+angleIn), getY()-diag*sin(getAngle()+angleIn));
+		glColor3f(r, g, b);
+		glVertex2f(getX()+diag*cos(angleIn-getAngle()), getY()-diag*sin(angleIn-getAngle()));
+		glColor3f(r, g, b);
+		glVertex2f(getX()+diag*cos(angleIn+getAngle()), getY()+diag*sin(angleIn+getAngle()));
+		glEnd();
+		glFlush();
+	}
 };
 //head, legL, legR, rotuleL, rotuleR, com
-//commande, getPos, drawOpenGL
+//commande, getPos, undertaker, score, drawOpenGL
 class Moustik {
 private:
 	Forme* ptrHead;
 	Forme* ptrLegL;
 	Forme* ptrLegR;
-	b2RevoluteJointDef rotuleL;
-	b2RevoluteJointDef rotuleR;
+	b2RevoluteJoint* rotuleL;
+	b2RevoluteJoint* rotuleR;
 	int com;
+	bool dead;
+	float score;
 public:
 	Moustik(b2World* ptrWorld, Coord pos){
 		com = 0;
+		dead=false;
+		score=0.0;
 		//définition des formes
 		ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
 		ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
 		ptrLegR = new Forme(ptrWorld, pos+Coord(0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
 		//définition de la rotuleL et rotuleR
-		rotuleL.Initialize(ptrHead->getBody(), ptrLegL->getBody(), coord2bvec(ptrHead->getHL()));
-		rotuleR.Initialize(ptrHead->getBody(), ptrLegR->getBody(), coord2bvec(ptrHead->getHR()));
+		b2RevoluteJointDef defRotuleL;
+		b2RevoluteJointDef defRotuleR;
+		defRotuleL.Initialize(ptrHead->getBody(), ptrLegL->getBody(), coord2bvec(ptrHead->getHL()));
+		defRotuleR.Initialize(ptrHead->getBody(), ptrLegR->getBody(), coord2bvec(ptrHead->getHR()));
+		//les jambes passent a travers la tête.
+		defRotuleL.collideConnected = false;
+		defRotuleR.collideConnected = false;
 		//angles limites rotules
 		float amax=2*M_PI/3;
-		rotuleL.enableLimit = true;
-		rotuleL.lowerAngle = -amax;
-		rotuleL.upperAngle = amax;
-		rotuleR.enableLimit = true;
-		rotuleR.lowerAngle = -amax;
-		rotuleR.upperAngle = amax;
+		defRotuleL.enableMotor = false;
+		defRotuleR.enableMotor = false;
+		defRotuleL.enableLimit = true;
+		defRotuleL.lowerAngle = -amax;
+		defRotuleL.upperAngle = amax;
+		defRotuleR.enableLimit = true;
+		defRotuleR.lowerAngle = -amax;
+		defRotuleR.upperAngle = amax;
 		//créer le joint
-		ptrWorld->CreateJoint(&rotuleL);
-		ptrWorld->CreateJoint(&rotuleR);
+		rotuleL = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defRotuleL );
+		rotuleR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defRotuleR );
 	}
 	~Moustik(){}
-	void commande(){
-		com=(com+1)%2;
-		cout<<com<<endl;
-		if (com==1){
-			rotuleL.enableMotor = true;
-			rotuleL.motorSpeed = M_PI/2;
-			rotuleL.maxMotorTorque = 1000; //how powerful is the motor ?
-			rotuleR.enableMotor = false;
+	void commande(b2World* ptrWorld){
+		com=1+com%2;
+		if (dead) { //on tue tout.
+			rotuleL->EnableMotor(false);
+			rotuleR->EnableMotor(false);
+		}	else if (com==1){
+			rotuleL->EnableMotor(true);
+  		rotuleL->SetMotorSpeed(M_PI);
+  		rotuleL->SetMaxMotorTorque(10);
+			rotuleR->EnableMotor(false);
 		} else if (com==2){
-			rotuleR.enableMotor = true;
-			rotuleR.motorSpeed = M_PI/2;
-			rotuleR.maxMotorTorque = 1000; //how powerful is the motor ?
-			rotuleL.enableMotor = false;
+			rotuleR->EnableMotor(true);
+  		rotuleR->SetMotorSpeed(M_PI);
+  		rotuleR->SetMaxMotorTorque(10);
+			rotuleL->EnableMotor(false);
 		}
 	}
 	Coord getPos(){
 		return ptrHead->getPos();
 	}
+	void undertaker(){
+		//permet de tester si le moustik et mort
+		float limit=6e-2;
+		if (ptrHead->getHL().y < 6e-2| ptrHead->getHR().y < 6e-2| ptrHead->getTL().y < 6e-2| ptrHead->getTR().y < 6e-2){
+			dead=true;
+		}
+	}
+	void setScore(){
+		score=max(ptrHead->getPos().x,score);
+	}
 	GLvoid drawOpenGL(){
-		ptrHead->drawOpenGL();
-		ptrLegL->drawOpenGL();
-		ptrLegR->drawOpenGL();
+		if (dead) { //si mort, il devient rouge
+			ptrHead->drawOpenGL(1.0f, 0.7f, 0.7f);
+			ptrLegL->drawOpenGL(1.0f, 0.7f, 0.7f);
+			ptrLegR->drawOpenGL(1.0f, 0.7f, 0.7f);
+		} else { //il est vivant
+			ptrHead->drawOpenGL();
+			if (com==1){
+				ptrLegL->drawOpenGL(0.7f, 1.0f, 0.7f);
+				ptrLegR->drawOpenGL();
+			} else if (com==2){
+				ptrLegL->drawOpenGL();
+				ptrLegR->drawOpenGL(0.7f, 1.0f, 0.7f);
+			} else if (com==0){
+				ptrLegL->drawOpenGL();
+				ptrLegR->drawOpenGL();
+			}
+		}
 	}
 };
 
@@ -291,13 +347,17 @@ GLvoid affichage(){
 GLvoid update(int fps){
 	int dt=floor(1000/fps); //dt=16ms pour 60fps
 	glutTimerFunc(dt, update, fps);
+
 	ptrWorld->Step((float32)1/fps, (int32)8, (int32)3);
+	cousin.undertaker(); //est-ce que il est mort ?
+	cousin.setScore();
+
 	glutPostRedisplay();
 }
 GLvoid clavier(unsigned char touche, int x, int y) {
 	switch(touche) {
 		case 's':
-		cousin.commande();
+		cousin.commande(ptrWorld);
 		break; //on ne peut commander qu'une seule jambe a la fois.
 		case 'g':
 		grid=!grid;
