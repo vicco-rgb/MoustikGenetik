@@ -1,22 +1,14 @@
 #include "genome.hpp"
 
 Population testInit(){
+  cout<<"TI1"<<endl;
   srand(time(NULL));
-  // vector<int> seq1{1,20,50,60,70};
-  // vector<int> seq2{3,60,80,10,40};
-  // vector<int> seq3{1,10,100,40,20};
-  // vector<int> seq4{30,40,20,90,500};
+  vector<int> seq1 {1,20,50,60,70};
+  vector<int> seq2 {3,60,80,10,40};
+  vector<int> seq3 {1,10,100,40,20};
+  vector<int> seq4 {30,40,20,90,500};
+  cout<<"TI2"<<endl;
 
-  vector<int> seq1;
-  vector<int> seq2;
-  vector<int> seq3;
-  vector<int> seq4;
-  for (int i=0; i<5; i++){
-    seq1.push_back(50);
-    seq2.push_back(60);
-    seq3.push_back(55);
-    seq4.push_back(43);
-  }
   Genome *s1 = new Genome(seq1);
   Genome *s2 = new Genome(seq2);
   Genome *s3 = new Genome(seq3);
@@ -27,8 +19,9 @@ Population testInit(){
   listGenomes.push_back(s2);
   listGenomes.push_back(s3);
   listGenomes.push_back(s4);
-
+  cout<<"TI3"<<endl;
   Population pop(listGenomes,0);
+  cout<<"TI4"<<endl;
   return pop;
 }
 
@@ -50,9 +43,11 @@ Genome::Genome() {
   }
 }
 vector<int> Genome::getRelativeSeq(){
+  //retourne une liste d'entiers strictement positifs
   return seq;
 }
 vector<int> Genome::getAbsoluteSeq(){
+  //retourne une suite de dates strictement croissantes
   vector<int> absoluteSeq;
   absoluteSeq.push_back(seq[0]);
   for (int i=1; i<seq.size(); i++) {
@@ -63,19 +58,22 @@ vector<int> Genome::getAbsoluteSeq(){
 int Genome::getFitness(){
   return fitness;
 }
-Genome* Genome::cross(Genome* s2){
+Genome* Genome::cross(Genome* genome){
+  //cette fonction produit un enfant génome à partir de deux parents
   Genome *fils = new Genome();
-  int n = rand()%seq.size();
-  for (int i=0;i<n;i++){
+  int prop = rand()%seq.size(); //prop in [0 taillegenome]
+  cout<<"CR1"<<endl;
+  for (int i=0;i<prop;i++){
+    //on recopie les prop premières dates du père
     fils->seq[i]=seq[i];
   }
-  for (int j=n;j<seq.size();j++){
-    fils->seq[j]=s2->seq[j];
+  cout<<"CR2"<<endl;
+  for (int j=prop;j<seq.size();j++){
+    //on recopie les seqSize-prop dernières dates de la mère
+    fils->seq[j]=genome->seq[j];
   }
+  cout<<"CR3"<<endl;
   fils->fitness=0;
-  for (int i=0;i<fils->seq.size();i++){
-    fils->fitness+=fils->seq[i];
-  }
   return fils;
 }
 Genome* Genome::mutation(){
@@ -91,8 +89,8 @@ Genome* Genome::mutation(){
   }
   return mutated;
 }
-bool Genome::betterThan(Genome* s1){
-  return (fitness > s1->fitness);
+bool Genome::betterThan(Genome* genome){
+  return (fitness > genome->fitness);
 }
 
 /*
@@ -116,6 +114,9 @@ Population::~Population(){}
 vector<Genome*> Population::getGenomes(){
   return genomes;
 }
+void Population::addGenome(Genome* nGenome){
+  genomes.push_back(nGenome);
+}
 int Population::getGeneration(){
   return generation;
 }
@@ -123,10 +124,13 @@ int Population::getGeneration(){
 Population Population::bests(int n){
   int best=0;
   //on trie toute la liste des genomes selon leur fitness
+  cout<<"BE1"<<endl;
   for(int i=0;i<genomes.size()-1;i++){
+    cout<<"BE"<<i<<endl;
     Genome *tmp = new Genome();
     best=i;
     for(int j=i+1;j<genomes.size();j++){
+      cout<<"BE"<<i<<"-"<<j<<endl;
       if (genomes[j]->betterThan(genomes[best])){
         best=j;
       }
@@ -144,17 +148,24 @@ Population Population::bests(int n){
   }
   return Population(bestGens, generation);
 }
-Population Population::reproduction(Population pop, int n){
-  vector<Genome*> gensCrossed = pop.getGenomes();
-  for (int i=0;i<n;i++){
-    int first=1+rand()%n;
-    int sec=1+rand()%n;
-    while (sec==first){
-      sec=1+rand()%n;
+Population Population::reproduction(Population pop){
+  int size=pop.getGenomes().size();
+  cout<<"RE1"<<endl;
+  vector<Genome*> childGenomes = pop.getGenomes();
+  cout<<"RE2"<<endl;
+  for (int i=0;i<size;i++){
+    //on cherche un papa et une maman pour l'enfant.
+    cout<<"REi - "<<i<<endl;
+    int dad=rand()%size;
+    int mom=rand()%size;
+    while (dad==mom){ //first et second doivent être différents.
+      cout<<"REequal"<<endl;
+      mom=rand()%size;
     }
-    gensCrossed[i]=pop.getGenomes()[first]->cross(pop.getGenomes()[sec]);
+    childGenomes[i]=pop.getGenomes()[dad]->cross(pop.getGenomes()[mom]);
   }
-  return Population(gensCrossed, pop.getGeneration());
+  cout<<"RE3"<<endl;
+  return Population(childGenomes, pop.getGeneration());
 }
 Population Population::mutateGroup(Population pop){
   vector<Genome*> gensMutated = pop.getGenomes();
@@ -164,27 +175,38 @@ Population Population::mutateGroup(Population pop){
   return Population(gensMutated, pop.getGeneration());
 }
 Population Population::getChildren(int n){
-  //cette fonction renvoie une population correspondant aux enfants de la population manipulée.
+  //cette fonction renvoie une population correspondant aux enfants issus des nmeilleurs parents de la population manipulée.
   //La population manipulée n'est pas écrasée
-  Population bestPop = bests(n); //les n meilleurs
-  Population newGeneration = reproduction(bestPop,n);
-  newGeneration.getGenomes().insert(newGeneration.getGenomes().end(), bestPop.getGenomes().begin(), bestPop.getGenomes().end());
-  newGeneration = mutateGroup(newGeneration);
+  cout<<"GC1"<<endl;
+  Population bestPop = bests(n); //les trouve les n meilleurs parents
+  cout<<"GC2"<<endl;
+  Population newGeneration = reproduction(bestPop); //on récupère les n enfants
+  cout<<"GC3"<<endl;
+
+  while (newGeneration.getGenomes().size()<genomes.size()){
+    //on recrée une population de la taille originale en complétant parmis les meilleurs parents.
+    newGeneration.addGenome(bestPop.getGenomes()[rand()%n]);
+  }
+  cout<<"GC4"<<endl;
+  newGeneration = mutateGroup(newGeneration); // on les fait muter
+  cout<<"GC5"<<endl;
   return newGeneration;
 }
 
 ostream& operator<<(ostream& os, Population pop){
   for (int i=0;i<pop.getGenomes().size();i++){
     //on affiche tous lse génomes les uns après les autres.
-    cout<<"##### GENOME "<<i<<" #####"<<endl<<pop.getGenomes()[i];
+    cout<<"##### GENOME "<<i<<" #####"<<endl<<pop.getGenomes()[i]<<endl;
   }
   cout<<endl;
   return os;
 }
 ostream& operator<<(ostream& os, Genome *genome){
+  int date=0;
   for (int i=0;i<genome->getAbsoluteSeq().size();i++){
     //on affiche les instants les uns à la suite des autres
-    cout<<genome->getAbsoluteSeq()[i]<<"-";
+    date=genome->getAbsoluteSeq()[i];
+    cout<<date<<endl;
   }
   cout<<endl;
   return os;

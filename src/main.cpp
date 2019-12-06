@@ -1,3 +1,8 @@
+
+/*
+		INCLUDES ###################################################################
+*/
+
 #ifdef __APPLE__ //OpenGL et GLUT
 #include <OpenGL/gl.h>
 #include <GLUT/GLUT.h>
@@ -184,7 +189,7 @@ public:
 		glFlush();
 	}
 };
-//head, legL, legR, rotuleL, rotuleR, com
+//head, legL, legR, rotuleL, rotuleR, com, dead, score, angleMax, controlType, sequence, seqWritten
 //commande, getPos, undertaker, updateScore, reset, getAbs, isIA, drawOpenGL, writeSeqDown
 class Moustik {
 protected:
@@ -273,7 +278,7 @@ public:
 			ptrLegR->getBody()->SetActive(false);
 			dead=true;
 			if (!seqWritten){
-				writeSeqDown(nFrame);
+				writeSeqDown(nFrame, "../src/mySequence.txt");
 			}
 		}
 	}
@@ -339,10 +344,10 @@ public:
 			}
 		}
 	}
-	void writeSeqDown(int nFrame){
+	void writeSeqDown(int nFrame, string filename){
 		//on écrit la séquence de jeu dans un fichier texte.
 		ofstream outfile;
-		outfile.open("../src/mySequence.txt", ios_base::app); //pour rajouter
+		outfile.open(filename, ios_base::app); //pour rajouter
 		for (int i=0;i<sequence.size();i++){
 				outfile<<sequence[i]<<"\t";
 		}
@@ -351,14 +356,15 @@ public:
 		seqWritten=true;
 	}
 };
-//ptrGenome
-//play
+//ptrGenome, id
+//play, undertaker, writeSeqDown
 class MoustikIA : public Moustik {
 protected:
 	Genome* ptrGenome;
 	int id;
 public:
-	MoustikIA(b2World* ptrWorld, Coord pos, Genome genome) : Moustik(ptrWorld, pos){
+	MoustikIA(b2World* ptrWorld, Coord pos, Genome genome, int id) : Moustik(ptrWorld, pos){
+		this->id=id;
 		controlType="IA";
 		ptrGenome=&genome;
 	}
@@ -369,7 +375,7 @@ public:
 			commande(ptrWorld, nFrame);
 		}
 	}
-	virtual void undertaker(){
+	virtual void undertaker(int nFrame){
 		//permet de tester si le moustik et mort
 		float limit=2e-2;
 		if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
@@ -378,13 +384,10 @@ public:
 			ptrLegL->getBody()->SetActive(false);
 			ptrLegR->getBody()->SetActive(false);
 			//on écrit la séquence de jeu dans un fichier texte.
-			ofstream outfile;
-			string filename="seqIA-"+to_string(id)+".txt";
-			outfile.open(filename);
-			for (int i=0;i<sequence.size();i++){
-					outfile<<sequence[i]<<"-";
+			if (!seqWritten){
+				string filename="seqIA-"+to_string(id)+".txt";
+				writeSeqDown(nFrame, filename);
 			}
-			outfile.close();
 		}
 	}
 };
@@ -393,13 +396,20 @@ public:
 		VARIABLES GLOBALES #########################################################
 */
 
-b2World* ptrWorld= new b2World(b2Vec2(0.0f,-9.81f));
-
-Moustik cousin(ptrWorld, Coord(0.0,2.0));
-
-Forme ground(ptrWorld, Coord(0.0,-1.0), 10.0, 1.0, 1);
+bool channel=true; //par défaut, mode de jeu
 bool grid=false;
+//REAL WORLD
+b2World* ptrWorld= new b2World(b2Vec2(0.0f,-9.81f));
+Moustik cousin(ptrWorld, Coord(0.0,3.0));
+Forme ground(ptrWorld, Coord(0.0,-1.0), 10.0, 1.0, 1);
 int nFrame=0;
+//IAWORLD
+b2World* ptrWorldIAs= new b2World(b2Vec2(0.0f,-9.81f));
+vector<int> seq {1,20,50,60,70};
+Genome genome(seq);
+MoustikIA cousinIA(ptrWorldIAs, Coord(0.0,3.0), genome, 0);
+Forme groundIAs(ptrWorldIAs, Coord(0.0,-1.0), 10.0, 1.0, 1);
+int nFrameIAs=0;
 
 /*
 		FONCTIONS OPENGL ###########################################################
@@ -452,25 +462,38 @@ GLvoid drawQuadrillage(int x1,int x2, int y1, int y2){
 GLvoid affichage(){
 	glClear(GL_COLOR_BUFFER_BIT); 	// Effacement du frame buffer
 
-	// cousin.drawOpenGL();
-	cousin.drawOpenGL();
-	ground.drawOpenGL();
-	if (grid){
+	if (channel) { //vrai monde
+		cousin.drawOpenGL();
+		ground.drawOpenGL();
+	} else {
+		cousinIA.drawOpenGL();
+		groundIAs.drawOpenGL();
+	}
+
+	if (grid){ //affichage de la grille
 		drawQuadrillage(floor(cousin.getAbs())-2,floor(cousin.getAbs())+5,-2,3);
 	}
+
 	glLoadIdentity();
 	gluOrtho2D(cousin.getAbs()-2.0, cousin.getAbs()+4.0, -1.0, 3.0);
 	glutSwapBuffers();
 }
 GLvoid update(int fps){
-	nFrame++;
 	int dt=floor(1000/fps); //dt=16ms pour 60fps
 	glutTimerFunc(dt, update, fps);
-
-	ptrWorld->Step((float32)1/fps, (int32)8, (int32)3);
-	cousin.undertaker(nFrame); //est-ce que il est mort ?
-	cousin.updateScore();
-
+	//le jeu se met en pause lorsque l'on change de channel
+	if (channel){ //on s'interesse au monde IA ou au monde jeu?
+		nFrame++;
+		ptrWorld->Step((float32)1/fps, (int32)8, (int32)3);
+		cousin.undertaker(nFrame); //est-ce que il est mort ?
+		cousin.updateScore();
+	} else {
+		nFrameIAs++;
+		ptrWorldIAs->Step((float32)1/fps, (int32)8, (int32)3);
+		cousinIA.play(ptrWorldIAs, nFrameIAs);
+		cousinIA.updateScore();
+		cousinIA.undertaker(nFrameIAs);
+	}
 	glutPostRedisplay();
 }
 GLvoid clavier(unsigned char touche, int x, int y) {
@@ -483,6 +506,9 @@ GLvoid clavier(unsigned char touche, int x, int y) {
 		break;
 		case 'i':
 		cousin.reset(ptrWorld);
+		break;
+		case 'c':
+		channel=!channel;
 		break;
 		case 'q' : // quitter
 		case 27 : //escape ou "q"
@@ -500,10 +526,12 @@ int main(int argc, char** argv){
 	B2_NOT_USED(argv);
 	int fps=60;
 
-	// Population popInit = testInit();
-	// Population children = popInit.getChildren(3);
-	// cout<<popInit<<endl<<"####### CHILDREN ##########"<<endl;
-  // cout<<children;
+	Population popInit = testInit();
+	cout<<"MA1"<<endl;
+	Population children = popInit.getChildren(3);
+	cout<<"MA2"<<endl;
+	cout<<popInit<<endl<<"####### CHILDREN ##########"<<endl;
+  cout<<children;
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);	// Choix du mode d'affichage (ici RVB)

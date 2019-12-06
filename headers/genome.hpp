@@ -12,12 +12,12 @@ private:
   vector<int> seq; //correspond à la durée pendant laquelle le moustik est resté sur la même jambe.
   float tauxMutation;
 public:
-  vector<int> getRelativeSeq();
-  vector<int> getAbsoluteSeq();
-  int getFitness();
   Genome(vector<int>);
   Genome();
   ~Genome(){};
+  vector<int> getRelativeSeq();
+  vector<int> getAbsoluteSeq();
+  int getFitness();
   Genome* cross(Genome*);
   Genome* mutation();
   bool betterThan(Genome*);
@@ -34,10 +34,11 @@ public:
   ~Population();
 
   vector<Genome*> getGenomes();
+  void addGenome(Genome*);
   int getGeneration();
 
   Population bests(int);
-  Population reproduction(Population,int);
+  Population reproduction(Population);
   Population mutateGroup(Population);
   Population getChildren(int);
 };
