@@ -178,49 +178,74 @@ public:
 		glFlush();
 	}
 };
-//head, legL, legR, rotuleL, rotuleR, com
+//head, legL, legR, hipL, hipR, com
 //commande, getPos, undertaker, updateScore, reset, drawOpenGL
 class Moustik {
 private:
 	Forme* ptrHead;
-	Forme* ptrLegL;
-	Forme* ptrLegR;
-	b2RevoluteJoint* rotuleL;
-	b2RevoluteJoint* rotuleR;
+	Forme* ptrThighL;
+	Forme* ptrThighR;
+	Forme* ptrTibiaL;
+	Forme* ptrTibiaR;
+	b2RevoluteJoint* hipL;
+	b2RevoluteJoint* hipR;
+	b2RevoluteJoint* kneeL;
+	b2RevoluteJoint* kneeR;
 	int com;
 	bool dead;
 	float score;
-	float angleMax;
+	float angleMaxThigh;
+	float angleTibia;
 public:
 	Moustik(b2World* ptrWorld, Coord pos){
 		com = 0;
 		dead=false;
 		score=0.0;
-		angleMax = 5*M_PI/6;
+		angleMaxThigh = 5*M_PI/6;
+		angleTibia = -3*M_PI/4;
 		//définition des formes
 		ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
-		ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
-		ptrLegR = new Forme(ptrWorld, pos+Coord(0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
-		//définition de la rotuleL et rotuleR
-		b2RevoluteJointDef defRotuleL;
-		b2RevoluteJointDef defRotuleR;
-		defRotuleL.Initialize(ptrHead->getBody(), ptrLegL->getBody(), coord2bvec(ptrHead->getHL()));
-		defRotuleR.Initialize(ptrHead->getBody(), ptrLegR->getBody(), coord2bvec(ptrHead->getHR()));
+		ptrThighL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0); //cuisse dynamique de 0.1x1
+		ptrThighR = new Forme(ptrWorld, pos+Coord(0.25,-0.75), 0.05, 0.5, 0);
+		ptrTibiaL = new Forme(ptrWorld, pos+Coord(-0.25, -1.75), 0.05, 0.5, 0);
+		ptrTibiaR = new Forme(ptrWorld, pos+Coord(0.25, -1.75), 0.05, 0.5, 0);
+		//définition de la hipL et hipR
+		b2RevoluteJointDef defhipL;
+		b2RevoluteJointDef defhipR;
+		b2RevoluteJointDef defkneeL;
+		b2RevoluteJointDef defkneeR;
+		defhipL.Initialize(ptrHead->getBody(), ptrThighL->getBody(), coord2bvec(ptrHead->getHL()));
+		defhipR.Initialize(ptrHead->getBody(), ptrThighR->getBody(), coord2bvec(ptrHead->getHR()));
+		defkneeL.Initialize(ptrThighR->getBody(), ptrTibiaL->getBody(), coord2bvec(ptrThighL->getPos()-Coord(0,-0.5)));
+		defkneeR.Initialize(ptrThighR->getBody(), ptrTibiaR->getBody(), coord2bvec(ptrThighR->getPos()-Coord(0,-0.5)));
 		//les jambes passent a travers la tête.
-		defRotuleL.collideConnected = false;
-		defRotuleR.collideConnected = false;
-		//angles limites rotules
-		defRotuleL.enableMotor = false;
-		defRotuleR.enableMotor = false;
-		defRotuleL.enableLimit = true;
-		defRotuleL.lowerAngle = -angleMax;
-		defRotuleL.upperAngle = angleMax;
-		defRotuleR.enableLimit = true;
-		defRotuleR.lowerAngle = -angleMax;
-		defRotuleR.upperAngle = angleMax;
+		defhipL.collideConnected = false;
+		defhipR.collideConnected = false;
+		defkneeL.collideConnected = false;
+		defkneeR.collideConnected = false;
+		//angles limites rotules hanches
+		defhipL.enableMotor = false;
+		defhipR.enableMotor = false;
+		defhipL.enableLimit = true;
+		defhipL.lowerAngle = -angleMaxThigh;
+		defhipL.upperAngle = angleMaxThigh;
+		defhipR.enableLimit = true;
+		defhipR.lowerAngle = -angleMaxThigh;
+		defhipR.upperAngle = angleMaxThigh;
+		//angles limites rotules genoux
+		defkneeL.enableMotor = false;
+		defkneeR.enableMotor = false;
+		defkneeL.enableLimit = true;
+		defkneeL.lowerAngle = angleTibia;
+		defkneeL.upperAngle = 0;
+		defkneeR.enableLimit = true;
+		defkneeR.lowerAngle = angleTibia;
+		defkneeR.upperAngle = 0;
 		//créer le joint
-		rotuleL = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defRotuleL );
-		rotuleR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defRotuleR );
+		hipL = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defhipL );
+		hipR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defhipR );
+		kneeL = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defkneeL );
+		kneeR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defkneeR );
 	}
 	~Moustik(){}
 	void commande(b2World* ptrWorld){
@@ -228,22 +253,22 @@ public:
 		float minTorque=5;
 		float maxTorque=50;
 		if (dead) { //on tue tout.
-			rotuleL->EnableMotor(false);
-			rotuleR->EnableMotor(false);
+			hipL->EnableMotor(false);
+			hipR->EnableMotor(false);
 		}	else if (com==1){
-			rotuleL->EnableMotor(true);
-  		rotuleL->SetMotorSpeed(M_PI/2); //1/4 de tour par seconde
-  		rotuleL->SetMaxMotorTorque(maxTorque);
-			rotuleR->EnableMotor(true);
-  		rotuleR->SetMotorSpeed(-M_PI/2);
-  		rotuleR->SetMaxMotorTorque(minTorque);
+			hipL->EnableMotor(true);
+  		hipL->SetMotorSpeed(M_PI/2); //1/4 de tour par seconde
+  		hipL->SetMaxMotorTorque(maxTorque);
+			hipR->EnableMotor(true);
+  		hipR->SetMotorSpeed(-M_PI/2);
+  		hipR->SetMaxMotorTorque(minTorque);
 		} else if (com==2){
-			rotuleR->EnableMotor(true);
-  		rotuleR->SetMotorSpeed(M_PI/2);
-  		rotuleR->SetMaxMotorTorque(maxTorque);
-			rotuleL->EnableMotor(true);
-  		rotuleL->SetMotorSpeed(-M_PI/2);
-  		rotuleL->SetMaxMotorTorque(minTorque);
+			hipR->EnableMotor(true);
+  		hipR->SetMotorSpeed(M_PI/2);
+  		hipR->SetMaxMotorTorque(maxTorque);
+			hipL->EnableMotor(true);
+  		hipL->SetMotorSpeed(-M_PI/2);
+  		hipL->SetMaxMotorTorque(minTorque);
 		}
 	}
 	Coord getPos(){
@@ -255,8 +280,8 @@ public:
 		if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
 			dead=true;
 			ptrHead->getBody()->SetActive(false);
-			ptrLegL->getBody()->SetActive(false);
-			ptrLegR->getBody()->SetActive(false);
+			ptrThighL->getBody()->SetActive(false);
+			ptrThighR->getBody()->SetActive(false);
 		}
 	}
 	void updateScore(){
@@ -264,53 +289,57 @@ public:
 	}
 	void reset(b2World* ptrWorld){
 		delete ptrHead;
-		delete ptrLegL;
-		delete ptrLegR;
-		//cette fonction ressemble au constructeur mais ne réinitialise pas le score, ni angleMax.
+		delete ptrThighL;
+		delete ptrThighR;
+		//cette fonction ressemble au constructeur mais ne réinitialise pas le score, ni angleMaxThigh.
 		com = 0;
 		dead = false;
 		//definition of bodies
 		Coord pos(0, 2);
 		ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
-		ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
-		ptrLegR = new Forme(ptrWorld, pos+Coord(0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
-		//définition de la rotuleL et rotuleR
-		b2RevoluteJointDef defRotuleL;
-		b2RevoluteJointDef defRotuleR;
-		defRotuleL.Initialize(ptrHead->getBody(), ptrLegL->getBody(), coord2bvec(ptrHead->getHL()));
-		defRotuleR.Initialize(ptrHead->getBody(), ptrLegR->getBody(), coord2bvec(ptrHead->getHR()));
+		ptrThighL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
+		ptrThighR = new Forme(ptrWorld, pos+Coord(0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
+		//définition de la hipL et hipR
+		b2RevoluteJointDef defhipL;
+		b2RevoluteJointDef defhipR;
+		defhipL.Initialize(ptrHead->getBody(), ptrThighL->getBody(), coord2bvec(ptrHead->getHL()));
+		defhipR.Initialize(ptrHead->getBody(), ptrThighR->getBody(), coord2bvec(ptrHead->getHR()));
 		//les jambes passent a travers la tête.
-		defRotuleL.collideConnected = false;
-		defRotuleR.collideConnected = false;
+		defhipL.collideConnected = false;
+		defhipR.collideConnected = false;
 		//angles limites rotules
-		defRotuleL.enableMotor = false;
-		defRotuleR.enableMotor = false;
-		defRotuleL.enableLimit = true;
-		defRotuleL.lowerAngle = -angleMax;
-		defRotuleL.upperAngle = angleMax;
-		defRotuleR.enableLimit = true;
-		defRotuleR.lowerAngle = -angleMax;
-		defRotuleR.upperAngle = angleMax;
+		defhipL.enableMotor = false;
+		defhipR.enableMotor = false;
+		defhipL.enableLimit = true;
+		defhipL.lowerAngle = -angleMaxThigh;
+		defhipL.upperAngle = angleMaxThigh;
+		defhipR.enableLimit = true;
+		defhipR.lowerAngle = -angleMaxThigh;
+		defhipR.upperAngle = angleMaxThigh;
 		//créer le joint
-		rotuleL = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defRotuleL );
-		rotuleR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defRotuleR );
+		hipL = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defhipL );
+		hipR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defhipR );
 	}
 	GLvoid drawOpenGL(){
 		if (dead) { //si mort, il devient rouge
 			ptrHead->drawOpenGL(1.0f, 0.7f, 0.7f);
-			ptrLegL->drawOpenGL(1.0f, 0.7f, 0.7f);
-			ptrLegR->drawOpenGL(1.0f, 0.7f, 0.7f);
+			ptrThighL->drawOpenGL(1.0f, 0.7f, 0.7f);
+			ptrThighR->drawOpenGL(1.0f, 0.7f, 0.7f);
+			ptrTibiaL->drawOpenGL(1.0f, 0.7f, 0.7f);
+			ptrTibiaR->drawOpenGL(1.0f, 0.7f, 0.7f);
 		} else { //il est vivant
 			ptrHead->drawOpenGL();
+			ptrTibiaL->drawOpenGL();
+			ptrTibiaR->drawOpenGL();
 			if (com==1){
-				ptrLegL->drawOpenGL(0.7f, 1.0f, 0.7f);
-				ptrLegR->drawOpenGL();
+				ptrThighL->drawOpenGL(0.7f, 1.0f, 0.7f);
+				ptrThighR->drawOpenGL();
 			} else if (com==2){
-				ptrLegL->drawOpenGL();
-				ptrLegR->drawOpenGL(0.7f, 1.0f, 0.7f);
+				ptrThighL->drawOpenGL();
+				ptrThighR->drawOpenGL(0.7f, 1.0f, 0.7f);
 			} else if (com==0){
-				ptrLegL->drawOpenGL();
-				ptrLegR->drawOpenGL();
+				ptrThighL->drawOpenGL();
+				ptrThighR->drawOpenGL();
 			}
 		}
 	}

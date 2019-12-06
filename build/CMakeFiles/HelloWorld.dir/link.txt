@@ -1,1 +1,0 @@
-/usr/bin/c++  -g  -rdynamic CMakeFiles/HelloWorld.dir/src/HelloWorld.cpp.o  -o HelloWorld -Wl,-rpath,/usr/local/lib -lBox2D -lGL -lGLU /usr/local/lib/libglut.so -lXmu -lXi 

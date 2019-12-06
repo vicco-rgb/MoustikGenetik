@@ -1,8 +1,4 @@
 build/
-build/**
-*OLD.cpp
-*OLD.h
-
 ## DEFAULT PAR GITHUB
 # Prerequisites
 *.d
@@ -36,4 +32,3 @@ build/**
 *.exe
 *.out
 *.app
-*/build/*
