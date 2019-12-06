@@ -194,8 +194,8 @@ private:
 	int com;
 	bool dead;
 	float score;
-	float angleMaxThigh;
-	float angleTibia;
+	float angleMaxThigh; //[-angleMaxThigh, angleMaxThigh]
+	float angleTibia; //[angleTibia, 0]
 public:
 	Moustik(b2World* ptrWorld, Coord pos){
 		com = 0;
@@ -216,16 +216,14 @@ public:
 		b2RevoluteJointDef defkneeR;
 		defhipL.Initialize(ptrHead->getBody(), ptrThighL->getBody(), coord2bvec(ptrHead->getHL()));
 		defhipR.Initialize(ptrHead->getBody(), ptrThighR->getBody(), coord2bvec(ptrHead->getHR()));
-		defkneeL.Initialize(ptrThighR->getBody(), ptrTibiaL->getBody(), coord2bvec(ptrThighL->getPos()-Coord(0,-0.5)));
-		defkneeR.Initialize(ptrThighR->getBody(), ptrTibiaR->getBody(), coord2bvec(ptrThighR->getPos()-Coord(0,-0.5)));
+		defkneeL.Initialize(ptrThighL->getBody(), ptrTibiaL->getBody(), coord2bvec(ptrThighL->getPos()+Coord(0,-0.5)));
+		defkneeR.Initialize(ptrThighR->getBody(), ptrTibiaR->getBody(), coord2bvec(ptrThighR->getPos()+Coord(0,-0.5)));
 		//les jambes passent a travers la tête.
 		defhipL.collideConnected = false;
 		defhipR.collideConnected = false;
 		defkneeL.collideConnected = false;
 		defkneeR.collideConnected = false;
 		//angles limites rotules hanches
-		defhipL.enableMotor = false;
-		defhipR.enableMotor = false;
 		defhipL.enableLimit = true;
 		defhipL.lowerAngle = -angleMaxThigh;
 		defhipL.upperAngle = angleMaxThigh;
@@ -233,14 +231,17 @@ public:
 		defhipR.lowerAngle = -angleMaxThigh;
 		defhipR.upperAngle = angleMaxThigh;
 		//angles limites rotules genoux
-		defkneeL.enableMotor = false;
-		defkneeR.enableMotor = false;
 		defkneeL.enableLimit = true;
 		defkneeL.lowerAngle = angleTibia;
 		defkneeL.upperAngle = 0;
 		defkneeR.enableLimit = true;
 		defkneeR.lowerAngle = angleTibia;
 		defkneeR.upperAngle = 0;
+		//motorisation rotules.
+		defhipL.enableMotor = false;
+		defhipR.enableMotor = false;
+		defkneeL.enableMotor = false;
+		defkneeR.enableMotor = false;
 		//créer le joint
 		hipL = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defhipL );
 		hipR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defhipR );
@@ -291,34 +292,49 @@ public:
 		delete ptrHead;
 		delete ptrThighL;
 		delete ptrThighR;
+		delete ptrTibiaL;
+		delete ptrTibiaR;
 		//cette fonction ressemble au constructeur mais ne réinitialise pas le score, ni angleMaxThigh.
 		com = 0;
 		dead = false;
 		//definition of bodies
-		Coord pos(0, 2);
+		Coord pos(0, 3);
 		ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
 		ptrThighL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
-		ptrThighR = new Forme(ptrWorld, pos+Coord(0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
-		//définition de la hipL et hipR
+		ptrThighR = new Forme(ptrWorld, pos+Coord(0.25,-0.75), 0.05, 0.5, 0);
+		ptrTibiaL = new Forme(ptrWorld, pos+Coord(-0.25, -1.75), 0.05, 0.5, 0);
+		ptrTibiaR = new Forme(ptrWorld, pos+Coord(0.25, -1.75), 0.05, 0.5, 0);
+		//définition des rotules
 		b2RevoluteJointDef defhipL;
 		b2RevoluteJointDef defhipR;
+		b2RevoluteJointDef defkneeL;
+		b2RevoluteJointDef defkneeR;
 		defhipL.Initialize(ptrHead->getBody(), ptrThighL->getBody(), coord2bvec(ptrHead->getHL()));
 		defhipR.Initialize(ptrHead->getBody(), ptrThighR->getBody(), coord2bvec(ptrHead->getHR()));
+		defkneeL.Initialize(ptrThighL->getBody(), ptrTibiaL->getBody(), coord2bvec(ptrThighL->getPos()+Coord(0,-0.5)));
+		defkneeR.Initialize(ptrThighR->getBody(), ptrTibiaR->getBody(), coord2bvec(ptrThighR->getPos()+Coord(0,-0.5)));
 		//les jambes passent a travers la tête.
 		defhipL.collideConnected = false;
 		defhipR.collideConnected = false;
+		defkneeL.collideConnected = false;
+		defkneeR.collideConnected = false;
 		//angles limites rotules
-		defhipL.enableMotor = false;
-		defhipR.enableMotor = false;
 		defhipL.enableLimit = true;
 		defhipL.lowerAngle = -angleMaxThigh;
 		defhipL.upperAngle = angleMaxThigh;
 		defhipR.enableLimit = true;
 		defhipR.lowerAngle = -angleMaxThigh;
 		defhipR.upperAngle = angleMaxThigh;
+		//motorisation rotules
+		defhipL.enableMotor = false;
+		defhipR.enableMotor = false;
+		defkneeL.enableMotor = false;
+		defkneeR.enableMotor = false;
 		//créer le joint
 		hipL = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defhipL );
 		hipR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defhipR );
+		kneeL = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defkneeL );
+		kneeR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defkneeR );
 	}
 	GLvoid drawOpenGL(){
 		if (dead) { //si mort, il devient rouge
@@ -352,7 +368,7 @@ public:
 b2Vec2 gravity(0.0f, -10.0f);
 b2World* ptrWorld= new b2World(gravity);
 
-Moustik cousin(ptrWorld, Coord(0.0,2.0));
+Moustik cousin(ptrWorld, Coord(0.0, 3.0));
 
 Forme ground(ptrWorld, Coord(0.0,-1.0), 10.0, 1.0, 1);
 bool grid=false;
