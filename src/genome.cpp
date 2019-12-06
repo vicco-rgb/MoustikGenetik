@@ -1,4 +1,7 @@
 #include "genome.hpp"
+/*
+TEST
+*/
 
 Population testInit(){
   cout<<"TI1"<<endl;
@@ -23,6 +26,30 @@ Population testInit(){
   Population pop(listGenomes,0);
   cout<<"TI4"<<endl;
   return pop;
+}
+
+/*
+SURCHARGES
+*/
+
+ostream& operator<<(ostream& os, Population pop){
+  for (int i=0;i<pop.getGenomes().size();i++){
+    //on affiche tous lse génomes les uns après les autres.
+    cout<<"##### GENOME "<<i<<" #####"<<endl<<pop.getGenomes()[i]<<endl;
+  }
+  cout<<endl;
+  return os;
+}
+ostream& operator<<(ostream& os, Genome *genome){
+  cout<<genome->getAbsoluteSeq()<<endl;
+  return os;
+}
+ostream& operator<<(ostream& os, vector<int> seq){
+  for (int i=0;i<seq.size();i++){
+    //on affiche les instants les uns à la suite des autres
+    cout<<seq[i]<<"\t";
+  }
+  return os;
 }
 
 /*
@@ -191,23 +218,4 @@ Population Population::getChildren(int n){
   newGeneration = mutateGroup(newGeneration); // on les fait muter
   cout<<"GC5"<<endl;
   return newGeneration;
-}
-
-ostream& operator<<(ostream& os, Population pop){
-  for (int i=0;i<pop.getGenomes().size();i++){
-    //on affiche tous lse génomes les uns après les autres.
-    cout<<"##### GENOME "<<i<<" #####"<<endl<<pop.getGenomes()[i]<<endl;
-  }
-  cout<<endl;
-  return os;
-}
-ostream& operator<<(ostream& os, Genome *genome){
-  int date=0;
-  for (int i=0;i<genome->getAbsoluteSeq().size();i++){
-    //on affiche les instants les uns à la suite des autres
-    date=genome->getAbsoluteSeq()[i];
-    cout<<date<<endl;
-  }
-  cout<<endl;
-  return os;
 }

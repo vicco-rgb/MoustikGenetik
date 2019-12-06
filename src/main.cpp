@@ -278,7 +278,7 @@ public:
 			ptrLegR->getBody()->SetActive(false);
 			dead=true;
 			if (!seqWritten){
-				writeSeqDown(nFrame, "../src/mySequence.txt");
+				writeSeqDown(nFrame, "../src/mySequence.txt", false);
 			}
 		}
 	}
@@ -344,10 +344,14 @@ public:
 			}
 		}
 	}
-	void writeSeqDown(int nFrame, string filename){
+	void writeSeqDown(int nFrame, string filename, bool erase){
 		//on écrit la séquence de jeu dans un fichier texte.
 		ofstream outfile;
-		outfile.open(filename, ios_base::app); //pour rajouter
+		if (erase) { // on écrase le fichier actuel
+			outfile.open(filename, ios_base::ate);
+		} else { //on ajoute au fichier actuel
+			outfile.open(filename, ios_base::app);
+		}
 		for (int i=0;i<sequence.size();i++){
 				outfile<<sequence[i]<<"\t";
 		}
@@ -357,21 +361,25 @@ public:
 	}
 };
 //ptrGenome, id
-//play, undertaker, writeSeqDown
+//play, undertaker, getSeq
 class MoustikIA : public Moustik {
 protected:
-	Genome* ptrGenome;
+	vector<int> sequence;
 	int id;
 public:
 	MoustikIA(b2World* ptrWorld, Coord pos, Genome genome, int id) : Moustik(ptrWorld, pos){
 		this->id=id;
 		controlType="IA";
-		ptrGenome=&genome;
+		sequence=genome.getAbsoluteSeq();
+	}
+	MoustikIA(b2World* ptrWorld, Coord pos, vector<int> seq, int id) : Moustik(ptrWorld, pos){
+		this->id=id;
+		controlType="IA";
+		sequence=seq;
 	}
 	void play(b2World* ptrWorld, int nFrame){
 		//fonction appelée a toutes les frames
-		vector<int> seq=ptrGenome->getAbsoluteSeq();
-		if (count(seq.begin(), seq.end(), nFrame)==1){
+		if (count(sequence.begin(), sequence.end(), nFrame)==1){
 			commande(ptrWorld, nFrame);
 		}
 	}
@@ -385,10 +393,13 @@ public:
 			ptrLegR->getBody()->SetActive(false);
 			//on écrit la séquence de jeu dans un fichier texte.
 			if (!seqWritten){
-				string filename="seqIA-"+to_string(id)+".txt";
-				writeSeqDown(nFrame, filename);
+				string filename="../src/seqIA-"+to_string(id)+".txt";
+				writeSeqDown(nFrame, filename, true);
 			}
 		}
+	}
+	vector<int> getSeq(){
+		return sequence;
 	}
 };
 
@@ -405,7 +416,7 @@ Forme ground(ptrWorld, Coord(0.0,-1.0), 10.0, 1.0, 1);
 int nFrame=0;
 //IAWORLD
 b2World* ptrWorldIAs= new b2World(b2Vec2(0.0f,-9.81f));
-vector<int> seq {1,20,50,60,70};
+vector<int> seq {120, 120, 120, 120};
 Genome genome(seq);
 MoustikIA cousinIA(ptrWorldIAs, Coord(0.0,3.0), genome, 0);
 Forme groundIAs(ptrWorldIAs, Coord(0.0,-1.0), 10.0, 1.0, 1);
@@ -526,12 +537,13 @@ int main(int argc, char** argv){
 	B2_NOT_USED(argv);
 	int fps=60;
 
-	Population popInit = testInit();
-	cout<<"MA1"<<endl;
-	Population children = popInit.getChildren(3);
-	cout<<"MA2"<<endl;
-	cout<<popInit<<endl<<"####### CHILDREN ##########"<<endl;
-  cout<<children;
+	cout<<cousinIA.getSeq()<<endl;
+	// Population popInit = testInit();
+	// cout<<"MA1"<<endl;
+	// Population children = popInit.getChildren(3);
+	// cout<<"MA2"<<endl;
+	// cout<<popInit<<endl<<"####### CHILDREN ##########"<<endl;
+  // cout<<children;
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);	// Choix du mode d'affichage (ici RVB)

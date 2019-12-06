@@ -46,6 +46,6 @@ public:
 //surcharge de l'opérateur cout
 ostream& operator<<(ostream&, Population);
 ostream& operator<<(ostream&, Genome);
-
+ostream& operator<<(ostream&, vector<int>);
 //fonction pour faire des tests
 Population testInit();
