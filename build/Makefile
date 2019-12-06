@@ -123,6 +123,33 @@ exec/fast:
 	$(MAKE) -f CMakeFiles/exec.dir/build.make CMakeFiles/exec.dir/build
 .PHONY : exec/fast
 
+src/draw.o: src/draw.cpp.o
+
+.PHONY : src/draw.o
+
+# target to build an object file
+src/draw.cpp.o:
+	$(MAKE) -f CMakeFiles/exec.dir/build.make CMakeFiles/exec.dir/src/draw.cpp.o
+.PHONY : src/draw.cpp.o
+
+src/draw.i: src/draw.cpp.i
+
+.PHONY : src/draw.i
+
+# target to preprocess a source file
+src/draw.cpp.i:
+	$(MAKE) -f CMakeFiles/exec.dir/build.make CMakeFiles/exec.dir/src/draw.cpp.i
+.PHONY : src/draw.cpp.i
+
+src/draw.s: src/draw.cpp.s
+
+.PHONY : src/draw.s
+
+# target to generate assembly for a file
+src/draw.cpp.s:
+	$(MAKE) -f CMakeFiles/exec.dir/build.make CMakeFiles/exec.dir/src/draw.cpp.s
+.PHONY : src/draw.cpp.s
+
 src/genome.o: src/genome.cpp.o
 
 .PHONY : src/genome.o
@@ -177,6 +204,33 @@ src/main.cpp.s:
 	$(MAKE) -f CMakeFiles/exec.dir/build.make CMakeFiles/exec.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/moustik.o: src/moustik.cpp.o
+
+.PHONY : src/moustik.o
+
+# target to build an object file
+src/moustik.cpp.o:
+	$(MAKE) -f CMakeFiles/exec.dir/build.make CMakeFiles/exec.dir/src/moustik.cpp.o
+.PHONY : src/moustik.cpp.o
+
+src/moustik.i: src/moustik.cpp.i
+
+.PHONY : src/moustik.i
+
+# target to preprocess a source file
+src/moustik.cpp.i:
+	$(MAKE) -f CMakeFiles/exec.dir/build.make CMakeFiles/exec.dir/src/moustik.cpp.i
+.PHONY : src/moustik.cpp.i
+
+src/moustik.s: src/moustik.cpp.s
+
+.PHONY : src/moustik.s
+
+# target to generate assembly for a file
+src/moustik.cpp.s:
+	$(MAKE) -f CMakeFiles/exec.dir/build.make CMakeFiles/exec.dir/src/moustik.cpp.s
+.PHONY : src/moustik.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -186,12 +240,18 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... exec"
 	@echo "... edit_cache"
+	@echo "... src/draw.o"
+	@echo "... src/draw.i"
+	@echo "... src/draw.s"
 	@echo "... src/genome.o"
 	@echo "... src/genome.i"
 	@echo "... src/genome.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/moustik.o"
+	@echo "... src/moustik.i"
+	@echo "... src/moustik.s"
 .PHONY : help
 
 

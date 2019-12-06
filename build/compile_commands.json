@@ -1,6 +1,11 @@
 [
 {
   "directory": "/home/vicco/vicloud/P1RV/build",
+  "command": "/usr/bin/c++   -I/home/vicco/vicloud/P1RV/headers  -g   -o CMakeFiles/exec.dir/src/draw.cpp.o -c /home/vicco/vicloud/P1RV/src/draw.cpp",
+  "file": "/home/vicco/vicloud/P1RV/src/draw.cpp"
+},
+{
+  "directory": "/home/vicco/vicloud/P1RV/build",
   "command": "/usr/bin/c++   -I/home/vicco/vicloud/P1RV/headers  -g   -o CMakeFiles/exec.dir/src/genome.cpp.o -c /home/vicco/vicloud/P1RV/src/genome.cpp",
   "file": "/home/vicco/vicloud/P1RV/src/genome.cpp"
 },
@@ -8,5 +13,10 @@
   "directory": "/home/vicco/vicloud/P1RV/build",
   "command": "/usr/bin/c++   -I/home/vicco/vicloud/P1RV/headers  -g   -o CMakeFiles/exec.dir/src/main.cpp.o -c /home/vicco/vicloud/P1RV/src/main.cpp",
   "file": "/home/vicco/vicloud/P1RV/src/main.cpp"
+},
+{
+  "directory": "/home/vicco/vicloud/P1RV/build",
+  "command": "/usr/bin/c++   -I/home/vicco/vicloud/P1RV/headers  -g   -o CMakeFiles/exec.dir/src/moustik.cpp.o -c /home/vicco/vicloud/P1RV/src/moustik.cpp",
+  "file": "/home/vicco/vicloud/P1RV/src/moustik.cpp"
 }
 ]
