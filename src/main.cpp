@@ -185,7 +185,7 @@ public:
 	}
 };
 //head, legL, legR, rotuleL, rotuleR, com
-//commande, getPos, undertaker, updateScore, reset, getAbs, isIA, drawOpenGL
+//commande, getPos, undertaker, updateScore, reset, getAbs, isIA, drawOpenGL, writeSeqDown
 class Moustik {
 protected:
 	Forme* ptrHead;
@@ -199,6 +199,7 @@ protected:
 	float angleMax;
 	string controlType;
 	vector<int> sequence;
+	bool seqWritten;
 public:
 	Moustik(b2World* ptrWorld, Coord pos){
 		com = 0;
@@ -207,8 +208,9 @@ public:
 		angleMax = 5*M_PI/6;
 		controlType="human";
 		ofstream outfile;
-		outfile.open("../src/mySequence.txt"); //écrase et créée un nouveau fichier
+		outfile.open("../src/mySequence.txt", ios_base::ate); //écrase et créée un nouveau fichier
 		outfile.close();
+		seqWritten=false;
 		//définition des formes
 		ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
 		ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
@@ -266,24 +268,20 @@ public:
 		//permet de tester si le moustik et mort
 		float limit=2e-2;
 		if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
-			dead=true;
 			ptrHead->getBody()->SetActive(false);
 			ptrLegL->getBody()->SetActive(false);
 			ptrLegR->getBody()->SetActive(false);
-			//on écrit la séquence de jeu dans un fichier texte.
-			ofstream outfile;
-	    outfile.open("../src/mySequence.txt", ios_base::app); //pour rajouter
-			for (int i=0;i<sequence.size();i++){
-					outfile<<sequence[i]<<"\t";
+			dead=true;
+			if (!seqWritten){
+				writeSeqDown(nFrame);
 			}
-			outfile<<"\n"<<nFrame<<"\n"; //correspond à fitness
-			outfile.close();
 		}
 	}
 	void updateScore(){
 		score=max(ptrHead->getPos().x, score);
 	}
 	void reset(b2World* ptrWorld){
+		seqWritten=false;
 		delete ptrHead;
 		delete ptrLegL;
 		delete ptrLegR;
@@ -340,6 +338,17 @@ public:
 				ptrLegR->drawOpenGL();
 			}
 		}
+	}
+	void writeSeqDown(int nFrame){
+		//on écrit la séquence de jeu dans un fichier texte.
+		ofstream outfile;
+		outfile.open("../src/mySequence.txt", ios_base::app); //pour rajouter
+		for (int i=0;i<sequence.size();i++){
+				outfile<<sequence[i]<<"\t";
+		}
+		outfile<<"\n"<<nFrame<<"\n"; //correspond à fitness
+		outfile.close();
+		seqWritten=true;
 	}
 };
 //ptrGenome
