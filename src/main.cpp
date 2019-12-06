@@ -5,13 +5,15 @@
 #include <GL/gl.h>
 #include <GL/glut.h>
 #endif
-#include <cmath>
-#include <Box2D/Box2D.h>
+#include <cmath> //pour M_PI, cos, sin et tan.
+#include <Box2D/Box2D.h> //pour la physique
 #include <stdio.h>
-#include <iostream>
-#include <fstream>
+#include <iostream> //pour écrire et lire dans un terminal
+#include <fstream> //pour écrire dans un fichier texte
+#include <string> //pour convertir int 2 string
 #include <vector>
-#include <algorithm>
+#include <ctime> //pour avoir accès à l'horloge et aux nombres alatoires
+#include <algorithm> //pour avoir des fonctions utiles avec vector
 #include "genome.hpp"
 using namespace std;
 
@@ -204,6 +206,9 @@ public:
 		score=0.0;
 		angleMax = 5*M_PI/6;
 		controlType="human";
+		ofstream outfile;
+		outfile.open("../src/mySequence.txt"); //écrase et créée un nouveau fichier
+		outfile.close();
 		//définition des formes
 		ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
 		ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
@@ -257,7 +262,7 @@ public:
 	Coord getPos(){
 		return ptrHead->getPos();
 	}
-	virtual void undertaker(){
+	virtual void undertaker(int nFrame){
 		//permet de tester si le moustik et mort
 		float limit=2e-2;
 		if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
@@ -267,10 +272,11 @@ public:
 			ptrLegR->getBody()->SetActive(false);
 			//on écrit la séquence de jeu dans un fichier texte.
 			ofstream outfile;
-	    outfile.open("mySequence.txt");
+	    outfile.open("../src/mySequence.txt", ios_base::app); //pour rajouter
 			for (int i=0;i<sequence.size();i++){
-					outfile<<sequence[i]<<"-";
+					outfile<<sequence[i]<<"\t";
 			}
+			outfile<<"\n"<<nFrame<<"\n"; //correspond à fitness
 			outfile.close();
 		}
 	}
@@ -349,7 +355,7 @@ public:
 	}
 	void play(b2World* ptrWorld, int nFrame){
 		//fonction appelée a toutes les frames
-		vector<int> seq=ptrGenome->getSeq();
+		vector<int> seq=ptrGenome->getAbsoluteSeq();
 		if (count(seq.begin(), seq.end(), nFrame)==1){
 			commande(ptrWorld, nFrame);
 		}
@@ -364,7 +370,7 @@ public:
 			ptrLegR->getBody()->SetActive(false);
 			//on écrit la séquence de jeu dans un fichier texte.
 			ofstream outfile;
-			string filename="seqIA-"+string(id)+".txt";
+			string filename="seqIA-"+to_string(id)+".txt";
 			outfile.open(filename);
 			for (int i=0;i<sequence.size();i++){
 					outfile<<sequence[i]<<"-";
@@ -372,7 +378,8 @@ public:
 			outfile.close();
 		}
 	}
-}
+};
+
 /*
 		VARIABLES GLOBALES #########################################################
 */
@@ -452,7 +459,7 @@ GLvoid update(int fps){
 	glutTimerFunc(dt, update, fps);
 
 	ptrWorld->Step((float32)1/fps, (int32)8, (int32)3);
-	cousin.undertaker(); //est-ce que il est mort ?
+	cousin.undertaker(nFrame); //est-ce que il est mort ?
 	cousin.updateScore();
 
 	glutPostRedisplay();
@@ -483,6 +490,11 @@ int main(int argc, char** argv){
 	B2_NOT_USED(argc);
 	B2_NOT_USED(argv);
 	int fps=60;
+
+	// Population popInit = testInit();
+	// Population children = popInit.getChildren(3);
+	// cout<<popInit<<endl<<"####### CHILDREN ##########"<<endl;
+  // cout<<children;
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);	// Choix du mode d'affichage (ici RVB)

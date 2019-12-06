@@ -9,32 +9,42 @@ using namespace std;
 class Genome {
 private:
   int fitness;
-  vector<int> seq;
-  float totMutation;
+  vector<int> seq; //correspond à la durée pendant laquelle le moustik est resté sur la même jambe.
+  float tauxMutation;
 public:
-  vector<int> getSeq();
+  vector<int> getRelativeSeq();
+  vector<int> getAbsoluteSeq();
   int getFitness();
   Genome(vector<int>);
   Genome();
   ~Genome(){};
-  virtual Genome* cross(Genome*);
-  virtual Genome* mutation();
-  virtual int compare(Genome*);
+  Genome* cross(Genome*);
+  Genome* mutation();
+  bool betterThan(Genome*);
 };
 
 class Population {
 private:
-  vector<Genome*> pop;
+  vector<Genome*> genomes;
+  int generation;
 public:
   Population();
-  Population(vector<Genome*>);
-  vector<Genome*> getPopulation();
-  vector<Genome*> best(int);
-  vector<Genome*> reproduction(vector<Genome*>,int);
-  vector<Genome*> mutateGroup(vector<Genome*>);
-  vector<Genome*> generation(int);
+  Population(vector<Genome*>, int);
+  Population(Population*);
+  ~Population();
+
+  vector<Genome*> getGenomes();
+  int getGeneration();
+
+  Population bests(int);
+  Population reproduction(Population,int);
+  Population mutateGroup(Population);
+  Population getChildren(int);
 };
 
 //surcharge de l'opérateur cout
-ostream& operator<<(ostream&, const Population);
-ostream& operator<<(ostream&, const vector<Genome*>);
+ostream& operator<<(ostream&, Population);
+ostream& operator<<(ostream&, Genome);
+
+//fonction pour faire des tests
+Population testInit();

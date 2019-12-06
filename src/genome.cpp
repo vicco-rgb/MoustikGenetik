@@ -1,97 +1,64 @@
 #include "genome.hpp"
 
-Population::Population(){}
-Population::Population(vector<Genome*> pop){
-  this->pop=pop;
-}
-vector<Genome*> Population::getPopulation(){
+Population testInit(){
+  srand(time(NULL));
+  // vector<int> seq1{1,20,50,60,70};
+  // vector<int> seq2{3,60,80,10,40};
+  // vector<int> seq3{1,10,100,40,20};
+  // vector<int> seq4{30,40,20,90,500};
+
+  vector<int> seq1;
+  vector<int> seq2;
+  vector<int> seq3;
+  vector<int> seq4;
+  for (int i=0; i<5; i++){
+    seq1.push_back(50);
+    seq2.push_back(60);
+    seq3.push_back(55);
+    seq4.push_back(43);
+  }
+  Genome *s1 = new Genome(seq1);
+  Genome *s2 = new Genome(seq2);
+  Genome *s3 = new Genome(seq3);
+  Genome *s4 = new Genome(seq4);
+
+  vector<Genome*> listGenomes;
+  listGenomes.push_back(s1);
+  listGenomes.push_back(s2);
+  listGenomes.push_back(s3);
+  listGenomes.push_back(s4);
+
+  Population pop(listGenomes,0);
   return pop;
 }
-vector<Genome*> Population::best(int n){
-  int best=0;
-  for(int i=0;i<pop.size()-1;i++){
-    Genome *tmp = new Genome();
-    best=i;
-    for(int j=i+1;j<pop.size();j++){
-      if ((pop[j]->compare(pop[best]))>0){
-        best=j;
-      }
-      if (best!=i){
-        *tmp=*pop[i];
-        *pop[i]=*pop[best];
-        *pop[best]=*tmp;
-      }
-    }
-  }
-  vector<Genome*> popBest;
-  for (vector<Genome*>::iterator it = pop.begin(); *it != pop[n]; ++it){
-    popBest.push_back(*it);
-  }
-  return popBest;
-}
-vector<Genome*> Population::reproduction(vector<Genome*> pop, int n){
-  vector<Genome*> popCrossed = pop;
-  for (int i=0;i<n;i++){
-    int first=rand()%n;
-    int sec=rand()%n;
-    while (sec==first){
-      sec=rand()%n;
-    }
-    popCrossed[i]=pop[first]->cross(pop[sec]);
-  }
-  return popCrossed;
-}
-vector<Genome*> Population::mutateGroup(vector<Genome*> pop){
-  vector<Genome*> popMutated = pop;
-  for (int i=0; i<pop.size();i++){
-    popMutated[i]=pop[i]->mutation();
-  }
-  return popMutated;
-}
-vector<Genome*> Population::generation(int m){
-  Population newGeneration;
-  Populaition bestPop;
-  bestPop=best(m);
-  newGeneration=reproduction(bestPop,m);
-  newGeneration.insert(newGeneration.end(),bestPop.begin(), bestPop.end());
-  newGeneration=mutateGroup(newGeneration);
-  cout<<newGeneration;
-  return newGeneration;
-}
 
-ostream& operator<<(ostream& os, const Population pop){
-  for (int i=0;i<pop.size();i++){
-    //on affiche tous lse génomes les uns après les autres.
-    cout<<pop.getPopulation()[i];
-  }
-  cout<<endl;
-}
-ostream& operator<<(ostream& os, const vector<Genome*> pop){
-  cout<<"{";
-  for (int j=0; j<pop[i]->getSeq().size();j++){
-    cout<<pop[i]->getSeq()[j]<< ",";
-  }
-  cout<<"} "<<pop[i]->getFitness()<<endl;
-  cout<<endl;
-  return os;
-}
+/*
+GENOME
+*/
 
-Genome::Genome(vector<int> seq) : totMutation(0.3) {
+Genome::Genome(vector<int> seq) {
+  tauxMutation=0.3;
   this->seq=seq;
   fitness=0;
-  for (int i=0;i<seq.size();i++){
-    fitness+=seq[i];
-  }
 }
-Genome::Genome() : totMutation(0.3) {
-  seq={0,0,0,0,0};
+Genome::Genome() {
+  tauxMutation=0.3;
+  seq={1};
   fitness=0;
   for (int i=0;i<seq.size();i++){
     fitness+=seq[i];
   }
 }
-vector<int> Genome::getSeq(){
+vector<int> Genome::getRelativeSeq(){
   return seq;
+}
+vector<int> Genome::getAbsoluteSeq(){
+  vector<int> absoluteSeq;
+  absoluteSeq.push_back(seq[0]);
+  for (int i=1; i<seq.size(); i++) {
+    absoluteSeq.push_back(absoluteSeq[i-1]+seq[i]);
+  }
+  return absoluteSeq;
 }
 int Genome::getFitness(){
   return fitness;
@@ -114,7 +81,7 @@ Genome* Genome::cross(Genome* s2){
 Genome* Genome::mutation(){
   Genome *mutated = new Genome();
   int n = rand()%100;
-  if (n<totMutation*100){
+  if (n<tauxMutation*100){
     seq[rand()%seq.size()]=rand()%10;
   }
   mutated->seq=seq;
@@ -124,7 +91,101 @@ Genome* Genome::mutation(){
   }
   return mutated;
 }
-int Genome::compare(Genome* s1){
-  int diff = fitness-s1->fitness;
-  return diff;
+bool Genome::betterThan(Genome* s1){
+  return (fitness > s1->fitness);
+}
+
+/*
+POPULATION
+*/
+
+//constructeurs-destructeurs
+Population::Population(){
+  generation=0;
+}
+Population::Population(vector<Genome*> genomes, int gen){
+  this->genomes=genomes;
+  generation=gen;
+}
+Population::Population(Population *pop){
+  genomes = pop->getGenomes();
+  generation = pop->getGeneration();
+}
+Population::~Population(){}
+//getters
+vector<Genome*> Population::getGenomes(){
+  return genomes;
+}
+int Population::getGeneration(){
+  return generation;
+}
+//reproduction
+Population Population::bests(int n){
+  int best=0;
+  //on trie toute la liste des genomes selon leur fitness
+  for(int i=0;i<genomes.size()-1;i++){
+    Genome *tmp = new Genome();
+    best=i;
+    for(int j=i+1;j<genomes.size();j++){
+      if (genomes[j]->betterThan(genomes[best])){
+        best=j;
+      }
+      if (best!=i){
+        *tmp=*genomes[i];
+        *genomes[i]=*genomes[best];
+        *genomes[best]=*tmp;
+      }
+    }
+  }
+  //on récupère les n premiers
+  vector<Genome*> bestGens;
+  for (vector<Genome*>::iterator it = genomes.begin(); *it != genomes[n]; ++it){
+    bestGens.push_back(*it);
+  }
+  return Population(bestGens, generation);
+}
+Population Population::reproduction(Population pop, int n){
+  vector<Genome*> gensCrossed = pop.getGenomes();
+  for (int i=0;i<n;i++){
+    int first=1+rand()%n;
+    int sec=1+rand()%n;
+    while (sec==first){
+      sec=1+rand()%n;
+    }
+    gensCrossed[i]=pop.getGenomes()[first]->cross(pop.getGenomes()[sec]);
+  }
+  return Population(gensCrossed, pop.getGeneration());
+}
+Population Population::mutateGroup(Population pop){
+  vector<Genome*> gensMutated = pop.getGenomes();
+  for (int i=0; i<pop.getGenomes().size();i++){
+    gensMutated[i]=pop.getGenomes()[i]->mutation();
+  }
+  return Population(gensMutated, pop.getGeneration());
+}
+Population Population::getChildren(int n){
+  //cette fonction renvoie une population correspondant aux enfants de la population manipulée.
+  //La population manipulée n'est pas écrasée
+  Population bestPop = bests(n); //les n meilleurs
+  Population newGeneration = reproduction(bestPop,n);
+  newGeneration.getGenomes().insert(newGeneration.getGenomes().end(), bestPop.getGenomes().begin(), bestPop.getGenomes().end());
+  newGeneration = mutateGroup(newGeneration);
+  return newGeneration;
+}
+
+ostream& operator<<(ostream& os, Population pop){
+  for (int i=0;i<pop.getGenomes().size();i++){
+    //on affiche tous lse génomes les uns après les autres.
+    cout<<"##### GENOME "<<i<<" #####"<<endl<<pop.getGenomes()[i];
+  }
+  cout<<endl;
+  return os;
+}
+ostream& operator<<(ostream& os, Genome *genome){
+  for (int i=0;i<genome->getAbsoluteSeq().size();i++){
+    //on affiche les instants les uns à la suite des autres
+    cout<<genome->getAbsoluteSeq()[i]<<"-";
+  }
+  cout<<endl;
+  return os;
 }
