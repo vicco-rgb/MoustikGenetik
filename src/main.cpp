@@ -9,6 +9,8 @@
 #include <Box2D/Box2D.h>
 #include <stdio.h>
 #include <iostream>
+#include <ofstream>
+#include <vector>
 #include "genome.hpp"
 using namespace std;
 
@@ -180,7 +182,7 @@ public:
 	}
 };
 //head, legL, legR, rotuleL, rotuleR, com
-//commande, getPos, undertaker, updateScore, reset, getAbs, drawOpenGL
+//commande, getPos, undertaker, updateScore, reset, getAbs, isIA, drawOpenGL
 class Moustik {
 private:
 	Forme* ptrHead;
@@ -192,12 +194,15 @@ private:
 	bool dead;
 	float score;
 	float angleMax;
+	string controlType;
+	vector<int> sequence;
 public:
 	Moustik(b2World* ptrWorld, Coord pos){
 		com = 0;
 		dead=false;
 		score=0.0;
 		angleMax = 5*M_PI/6;
+		controlType="human";
 		//définition des formes
 		ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
 		ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
@@ -224,7 +229,8 @@ public:
 		rotuleR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defRotuleR );
 	}
 	~Moustik(){}
-	void commande(b2World* ptrWorld){
+	void commande(b2World* ptrWorld, int nFrame){
+		sequence.push_back(nFrame);
 		com=1+com%2;
 		float minTorque=5;
 		float maxTorque=50;
@@ -258,6 +264,8 @@ public:
 			ptrHead->getBody()->SetActive(false);
 			ptrLegL->getBody()->SetActive(false);
 			ptrLegR->getBody()->SetActive(false);
+
+			// A FAIRE : écrire la séquence dans un fichier texte.
 		}
 	}
 	void updateScore(){
@@ -299,6 +307,9 @@ public:
 	float getAbs(){
 		return ptrHead->getPos().x;
 	}
+	bool isIA(){
+		return controlType;
+	}
 	GLvoid drawOpenGL(){
 		if (dead) { //si mort, il devient rouge
 			ptrHead->drawOpenGL(1.0f, 0.7f, 0.7f);
@@ -319,7 +330,24 @@ public:
 		}
 	}
 };
-
+//ptrGenome
+//play
+class MoustikIA : public Moustik {
+private:
+	Genome* ptrGenome;
+public:
+	MoustikIA(b2World* ptrWorld, Coord pos, Genome genome) : Moustik(ptrWorld, pos){
+		controlType="IA";
+		ptrGenome=&genome;
+	}
+	void play(int nFrame){
+		//fonction appelée a toutes les frames
+		vector<int> seq=ptrGenome->getSeq();
+		if (count(0, seq.size(), nFrame)==1){
+			commande();
+		}
+	}
+}
 /*
 		VARIABLES GLOBALES #########################################################
 */
@@ -331,6 +359,7 @@ Moustik cousin(ptrWorld, Coord(0.0,2.0));
 
 Forme ground(ptrWorld, Coord(0.0,-1.0), 10.0, 1.0, 1);
 bool grid=false;
+int nFrame=0;
 
 /*
 		FONCTIONS OPENGL ###########################################################
@@ -394,6 +423,7 @@ GLvoid affichage(){
 	glutSwapBuffers();
 }
 GLvoid update(int fps){
+	nFrame++;
 	int dt=floor(1000/fps); //dt=16ms pour 60fps
 	glutTimerFunc(dt, update, fps);
 
@@ -406,7 +436,7 @@ GLvoid update(int fps){
 GLvoid clavier(unsigned char touche, int x, int y) {
 	switch(touche) {
 		case 's':
-		cousin.commande(ptrWorld);
+		cousin.commande(ptrWorld, nFrame);
 		break; //on ne peut commander qu'une seule jambe a la fois.
 		case 'g':
 		grid=!grid;

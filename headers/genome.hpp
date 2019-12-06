@@ -6,7 +6,7 @@
 #include <iostream>
 using namespace std;
 
-class genome {
+class Genome {
 private:
     int fitness;
     vector<int> seq;
@@ -14,24 +14,24 @@ private:
 public:
     vector<int> getSeq();
     int getFitness();
-    genome(vector<int>);
-    genome();
-    ~genome(){};
-    virtual genome* cross(genome*);
-    virtual genome* mutation();
-    virtual int compare(genome*);
+    Genome(vector<int>);
+    Genome();
+    ~Genome(){};
+    virtual Genome* cross(Genome*);
+    virtual Genome* mutation();
+    virtual int compare(Genome*);
 };
 
-class population {
+class Population {
 private:
-    vector<genome*> pop;
+    vector<Genome*> pop;
 public:
-    population(vector<genome*>);
-    vector<genome*> best(int);
-    vector<genome*> reproduction(vector<genome*>,int);
-    vector<genome*> mutateGroup(vector<genome*>);
-    vector<genome*> generation(int);
+    Population(vector<Genome*>);
+    vector<Genome*> best(int);
+    vector<Genome*> reproduction(vector<Genome*>,int);
+    vector<Genome*> mutateGroup(vector<Genome*>);
+    vector<Genome*> generation(int);
     void affichage();
 };
 
-void affichageVec(vector<genome*> pop);
+void affichageVec(vector<Genome*> pop);
