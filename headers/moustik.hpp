@@ -83,7 +83,7 @@ public:
 	void updateScore();
 	void reset(b2World*);
 	float getAbs();
-	string type();
+	string getType();
 	GLvoid drawOpenGL();
 	void writeSeqDown(int, string, bool);
 };

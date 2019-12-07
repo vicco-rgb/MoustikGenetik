@@ -1,7 +1,7 @@
 #include "draw.hpp"
 
 /*
-		VARIABLES GLOBALES #########################################################
+VARIABLES GLOBALES #########################################################
 */
 
 extern bool channel; //par défaut, mode de jeu
@@ -18,7 +18,7 @@ extern Forme groundIAs;
 extern int nFrameIAs;
 
 /*
-		FONCTIONS OPENGL ###########################################################
+FONCTIONS OPENGL ###########################################################
 */
 
 void reshape(GLsizei width, GLsizei height) {
@@ -71,17 +71,19 @@ GLvoid affichage(){
 	if (channel) { //vrai monde
 		cousin.drawOpenGL();
 		ground.drawOpenGL();
+		glLoadIdentity();
+		gluOrtho2D(cousin.getAbs()-2.0, cousin.getAbs()+4.0, -1.0, 3.0);
 	} else {
 		cousinIA.drawOpenGL();
 		groundIAs.drawOpenGL();
+		glLoadIdentity();
+		gluOrtho2D(cousinIA.getAbs()-2.0, cousinIA.getAbs()+4.0, -1.0, 3.0);
 	}
 
 	if (grid){ //affichage de la grille
 		drawQuadrillage(floor(cousin.getAbs())-2,floor(cousin.getAbs())+5,-2,3);
 	}
 
-	glLoadIdentity();
-	gluOrtho2D(cousin.getAbs()-2.0, cousin.getAbs()+4.0, -1.0, 3.0);
 	glutSwapBuffers();
 }
 GLvoid update(int fps){
@@ -89,18 +91,18 @@ GLvoid update(int fps){
 	glutTimerFunc(dt, update, fps);
 	//le jeu se met en pause lorsque l'on change de channel
 	if (channel){ //on s'interesse au monde IA ou au monde jeu?
-		nFrame++;
-		ptrWorld->Step((float32)1/fps, (int32)8, (int32)3);
-		cousin.undertaker(nFrame); //est-ce que il est mort ?
-		cousin.updateScore();
-	} else {
-		nFrameIAs++;
-		ptrWorldIAs->Step((float32)1/fps, (int32)8, (int32)3);
-		cousinIA.play(ptrWorldIAs, nFrameIAs);
-		cousinIA.updateScore();
-		cousinIA.undertaker(nFrameIAs);
-	}
-	glutPostRedisplay();
+	nFrame++;
+	ptrWorld->Step((float32)1/fps, (int32)8, (int32)3);
+	cousin.undertaker(nFrame); //est-ce que il est mort ?
+	cousin.updateScore();
+} else {
+	nFrameIAs++;
+	ptrWorldIAs->Step((float32)1/fps, (int32)8, (int32)3);
+	cousinIA.play(ptrWorldIAs, nFrameIAs);
+	cousinIA.updateScore();
+	cousinIA.undertaker(nFrameIAs);
+}
+glutPostRedisplay();
 }
 GLvoid clavier(unsigned char touche, int x, int y) {
 	switch(touche) {
@@ -118,7 +120,7 @@ GLvoid clavier(unsigned char touche, int x, int y) {
 		break;
 		case 'q' : // quitter
 		case 27 : //escape ou "q"
-			exit(0);
+		exit(0);
 		break;
 	}
 }

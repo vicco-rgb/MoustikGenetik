@@ -221,7 +221,7 @@ void Moustik::undertaker(int nFrame){
     ptrLegR->getBody()->SetActive(false);
     dead=true;
     if (!seqWritten){
-      writeSeqDown(nFrame, "../src/mySequence.txt", false);
+      writeSeqDown(ptrHead->getPos().x, "../src/"+controlType+".txt", false);
     }
   }
 }
@@ -265,7 +265,7 @@ void Moustik::reset(b2World* ptrWorld){
 float Moustik::getAbs(){
   return ptrHead->getPos().x;
 }
-string Moustik::type(){
+string Moustik::getType(){
   return controlType;
 }
 GLvoid Moustik::drawOpenGL(){
@@ -287,7 +287,7 @@ GLvoid Moustik::drawOpenGL(){
     }
   }
 }
-void Moustik::writeSeqDown(int nFrame, string filename, bool erase){
+void Moustik::writeSeqDown(int fitness, string filename, bool erase){
   //on écrit la séquence de jeu dans un fichier texte.
   ofstream outfile;
   if (erase) { // on écrase le fichier actuel
@@ -329,7 +329,7 @@ void MoustikIA::undertaker(int nFrame){
     ptrLegR->getBody()->SetActive(false);
     //on écrit la séquence de jeu dans un fichier texte.
     if (!seqWritten){
-      string filename="../src/seqIA-"+to_string(id)+".txt";
+      string filename="../src/"+controlType+"-"+to_string(id)+".txt";
       writeSeqDown(nFrame, filename, true);
     }
   }

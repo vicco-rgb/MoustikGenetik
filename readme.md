@@ -19,8 +19,13 @@ make
 ```
 
 # COMMANDES DE JEU
-Appuyer sur 's' pour changer la jambe d'appui.
-Appuyer sur 'q' pour quitter le jeu.
+key  | action
+--|--
+`s`  |  change jambe d'appui
+`q`/`esc`  |  quitte le jeu
+`c`  |  passer le le jeu en IA ou humain
+`g`  | affiche la grille
 
 Si un problème est rencontré vous pouvez faire remonter l'information par mail :
- - victor.duvivier@eleves.ec-nantes.fr; chloe.leric@eleves.ec-nantes.fr
+ - victor.duvivier@eleves.ec-nantes.fr
+ - chloe.leric@eleves.ec-nantes.fr
