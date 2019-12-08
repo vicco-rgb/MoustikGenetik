@@ -8,7 +8,6 @@ VARIABLES GLOBALES #############################################################
 
 extern bool channel; //par défaut, mode de jeu
 extern bool grid;
-extern bool fastMode;
 //REAL WORLD
 extern b2World* ptrWorld;
 extern Moustik* cousin;
@@ -103,8 +102,6 @@ glutPostRedisplay();
 }
 GLvoid clavier(unsigned char touche, int x, int y) {
 	switch(touche) {
-		case 'v':
-		fastMode=!fastMode;
 		case 's':
 		cousin->commande(ptrWorld, nFrame);
 		break; //on ne peut commander qu'une seule jambe a la fois.
