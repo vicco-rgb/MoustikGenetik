@@ -51,6 +51,8 @@ public:
 
   void playLive(int);
   void playOff();
+
+  void writeGenomes();
 };
 
 //surcharge de l'opérateur cout

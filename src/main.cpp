@@ -61,7 +61,7 @@ void Init(){
 
 	for (int i=0; i<50; i++){
 		Genome* genomeIA = new Genome(40);
-		MoustikIA* cousinIA = new MoustikIA(ptrWorldIAs, Coord(0.0,3.0), genomeIA, i);
+		MoustikIA* cousinIA = new MoustikIA(ptrWorldIAs, Coord(0.0,3.0), genomeIA, to_string(i));
 		cousinIA->isActive(false); //on rend le moustik inactif
 		HomoSapiens->addMoustik(cousinIA);
 	}
@@ -74,11 +74,13 @@ void Init(){
 int main(int argc, char** argv){
 	B2_NOT_USED(argc);
 	B2_NOT_USED(argv);
+	srand(time(0));
 
 	Init(); 	//définition des variables.
 
 	HomoSapiens->playOff();
-
+	HomoSapiens->writeGenomes();
+	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);	// Choix du mode d'affichage (ici RVB)
 	glutInitWindowPosition(0,0); // Position initiale de la fenetre GLUT

@@ -163,10 +163,8 @@ Moustik::Moustik(b2World* ptrWorld, Coord pos){
   dead=false;
   angleMax = 5*M_PI/6;
   controlType="human";
-  ofstream outfile;
-  outfile.open("../sequences/mySequence.txt", ios_base::ate); //écrase et créée un nouveau fichier
-  outfile.close();
   seqWritten=false;
+  genome= new Genome();
   //définition des formes
   ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
   ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
@@ -313,12 +311,12 @@ void Moustik::writeGenome(int fitness, string filename, bool erase){
   seqWritten=true;
 }
 
-MoustikIA::MoustikIA(b2World* ptrWorld, Coord pos, Genome* genome, int id) : Moustik(ptrWorld, pos){
+MoustikIA::MoustikIA(b2World* ptrWorld, Coord pos, Genome* genome, string id) : Moustik(ptrWorld, pos){
   this->id=id;
   controlType="IA";
   this->genome=genome;
 }
-MoustikIA::MoustikIA(b2World* ptrWorld, Coord pos, vector<int> seq, int id) : Moustik(ptrWorld, pos){
+MoustikIA::MoustikIA(b2World* ptrWorld, Coord pos, vector<int> seq, string id) : Moustik(ptrWorld, pos){
   this->id=id;
   controlType="IA";
   genome = new Genome(seq);

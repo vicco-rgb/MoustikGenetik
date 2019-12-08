@@ -125,6 +125,8 @@ class Population {
 ```
 faire une méthode pour population qui lance la simulation des moustiks un par un, qui détermine leur fitnesse à chacun et qui ensuite écrive dans des dossiers (génération/id xxx/yyy).
 
+writeGenomes() de Population écrit un fichier "generationXXX.txt" contenant des séquences avec des retours à la ligne.
+
 ## Bibliographie
 pdf
 : [NatureOfCode](https://natureofcode.com/book/chapter-5-physics-libraries/)

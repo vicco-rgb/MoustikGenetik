@@ -92,8 +92,8 @@ class MoustikIA : public Moustik {
 protected:
 	string id; //de la forme generation/numero
 public:
-	MoustikIA(b2World*, Coord, Genome*, int);
-	MoustikIA(b2World*, Coord, vector<int>, int);
+	MoustikIA(b2World*, Coord, Genome*, string);
+	MoustikIA(b2World*, Coord, vector<int>, string);
 	Genome* getGenome(); //on pourrait rendre cette fonction virtuelle
   void setGenome(Genome*);
   void setID(string);

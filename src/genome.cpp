@@ -52,15 +52,14 @@ Genome::Genome(vector<int> seq) {
 Genome::Genome(int tailleSeq) {
   //cette fonction fabrique un génome[tailleSeq] aléatoirement
   for (int i=0; i++; i<tailleSeq){
-    //nombres aléatoires entre 0 et 20;
-    seq.push_back(rand()%20);
+    //nombres aléatoires entre 1 et 20;
+    seq.push_back(1+rand()%20);
   }
   fitness=-1;
   tauxMutation=0.3;
 }
-Genome::Genome() {
+Genome::Genome(){
   tauxMutation=0.3;
-  seq={1};
   fitness=-1;
 }
 vector<int> Genome::getRelativeSeq(){
@@ -83,7 +82,11 @@ void Genome::setFitness(float fit){
   fitness=fit;
 }
 void Genome::addAbsoluteDate(int nFrame){
-  seq.push_back(nFrame-seq.back());
+  int previous=0;
+  if (seq.size()>0){
+    previous=seq.back();
+  }
+  seq.push_back(nFrame-previous);
 }
 Genome* Genome::crossSplit(Genome* genome){
   //cette fonction produit un enfant génome à partir de deux parents en prenant la première partie du père et la dernière partie de la mère.
@@ -153,7 +156,7 @@ Population::Population(){
 Population::Population(vector<MoustikIA*> nMoustiks, int gen){
   moustiks=nMoustiks;
   for (int i=0; i<nMoustiks.size();i++){
-    moustiks[i]->setID("0/"+to_string(i));
+    moustiks[i]->setID("gen"+to_string(gen)+"/"+to_string(i));
   }
   generation=gen;
 }
@@ -252,8 +255,18 @@ void Population::playOff(){
       moustiks[i]->updateFitness();
     }
     moustiks[i]->isActive(false);
-    string filename="../sequences/"+moustiks[i]->getID()+".txt";
-    moustiks[i]->writeGenome(moustiks[i]->getGenome()->getFitness(), filename, true);
-    cout<<100*i/moustiks.size()<<"% - écriture de "<<filename<<endl;
   }
+}
+void Population::writeGenomes(){
+  //on écrit la séquence de jeu dans un fichier texte.
+  ofstream outfile;
+  outfile.open("../sequences/generation"+to_string(generation)+".txt");
+  for (int i=0; i<moustiks.size(); i++){
+    vector<int> sequence=moustiks[i]->getGenome()->getRelativeSeq();
+    for (int j=0; j<sequence.size();j++){
+      outfile<<sequence[j]<<"\t";
+    }
+    outfile<<endl<<moustiks[i]->getGenome()->getFitness()<<endl;
+  }
+  outfile.close();
 }
