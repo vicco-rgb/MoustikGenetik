@@ -21,7 +21,8 @@ public:
   ~Genome(){};
   vector<int> getRelativeSeq();
   vector<int> getAbsoluteSeq();
-  int getFitness();
+  float getFitness();
+  void setFitness(float);
   void addAbsoluteDate(int);
   Genome* crossSplit(Genome*);
   Genome* crossAvg(Genome*);
@@ -47,6 +48,9 @@ public:
   Population reproduction(Population);
   Population mutateGroup(Population);
   Population getChildren(int);
+
+  void playLive(int);
+  void playOff();
 };
 
 //surcharge de l'opérateur cout

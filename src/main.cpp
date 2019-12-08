@@ -65,7 +65,6 @@ void Init(){
 		cousinIA->isActive(false); //on rend le moustik inactif
 		HomoSapiens->addMoustik(cousinIA);
 	}
-
 }
 
 /*
@@ -77,6 +76,8 @@ int main(int argc, char** argv){
 	B2_NOT_USED(argv);
 
 	Init(); 	//définition des variables.
+
+	HomoSapiens->playOff();
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);	// Choix du mode d'affichage (ici RVB)

@@ -8,6 +8,7 @@ VARIABLES GLOBALES #############################################################
 
 extern bool channel; //par défaut, mode de jeu
 extern bool grid;
+extern bool fastMode;
 //REAL WORLD
 extern b2World* ptrWorld;
 extern Moustik* cousin;
@@ -77,7 +78,7 @@ GLvoid affichage(){
 		gluOrtho2D(cousin->getAbs()-2.0, cousin->getAbs()+4.0, -1.0, 3.0);
 	} else {
 		groundIAs->drawOpenGL();
-
+		//faire passer les moustiks les uns après les autres.
 	}
 	if (grid){ //affichage de la grille
 		drawQuadrillage(floor(cousin->getAbs())-2,floor(cousin->getAbs())+5,-2,3);
@@ -92,7 +93,7 @@ GLvoid update(int fps){
 	nFrame++;
 	ptrWorld->Step((float32)1/fps, (int32)8, (int32)3);
 	cousin->undertaker(nFrame); //est-ce que il est mort ?
-	cousin->updateScore();
+	cousin->updateFitness();
 } else {
 	nFrameIAs++;
 	ptrWorldIAs->Step((float32)1/fps, (int32)8, (int32)3);
@@ -102,6 +103,8 @@ glutPostRedisplay();
 }
 GLvoid clavier(unsigned char touche, int x, int y) {
 	switch(touche) {
+		case 'v':
+		fastMode=!fastMode;
 		case 's':
 		cousin->commande(ptrWorld, nFrame);
 		break; //on ne peut commander qu'une seule jambe a la fois.

@@ -69,7 +69,6 @@ protected:
 	b2RevoluteJoint* rotuleR;
 	int com;
 	bool dead;
-	float score;
 	float angleMax;
 	string controlType;
 	Genome* genome;
@@ -80,8 +79,8 @@ public:
 	~Moustik();
 	void commande(b2World*, int);
 	Coord getPos();
-	virtual void undertaker(int);
-	void updateScore();
+	virtual bool undertaker(int);
+	void updateFitness();
 	void reset(b2World*);
 	float getAbs();
 	string getType();
@@ -98,7 +97,8 @@ public:
 	Genome* getGenome(); //on pourrait rendre cette fonction virtuelle
   void setGenome(Genome*);
   void setID(string);
+  string getID();
   void isActive(bool);
 	void play(b2World*, int);
-	virtual void undertaker(int);
+	virtual bool undertaker(int);
 };

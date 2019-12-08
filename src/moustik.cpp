@@ -161,11 +161,10 @@ GLvoid Forme::drawOpenGL(float r, float g, float b){
 Moustik::Moustik(b2World* ptrWorld, Coord pos){
   com = 0;
   dead=false;
-  score=0.0;
   angleMax = 5*M_PI/6;
   controlType="human";
   ofstream outfile;
-  outfile.open("../src/mySequence.txt", ios_base::ate); //écrase et créée un nouveau fichier
+  outfile.open("../sequences/mySequence.txt", ios_base::ate); //écrase et créée un nouveau fichier
   outfile.close();
   seqWritten=false;
   //définition des formes
@@ -221,7 +220,7 @@ void Moustik::commande(b2World* ptrWorld, int nFrame){
 Coord Moustik::getPos(){
   return ptrHead->getPos();
 }
-void Moustik::undertaker(int nFrame){
+bool Moustik::undertaker(int nFrame){
   //permet de tester si le moustik et mort
   float limit=2e-2;
   if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
@@ -230,12 +229,13 @@ void Moustik::undertaker(int nFrame){
     ptrLegR->getBody()->SetActive(false);
     dead=true;
     if (!seqWritten){
-      writeGenome(ptrHead->getPos().x, "../src/"+controlType+".txt", false);
+      writeGenome(ptrHead->getPos().x, "../sequences/"+controlType+".txt", false);
     }
   }
+  return dead;
 }
-void Moustik::updateScore(){
-  score=max(ptrHead->getPos().x, score);
+void Moustik::updateFitness(){
+  genome->setFitness(max(ptrHead->getPos().x, genome->getFitness()));
 }
 void Moustik::reset(b2World* ptrWorld){
   seqWritten=false;
@@ -308,7 +308,7 @@ void Moustik::writeGenome(int fitness, string filename, bool erase){
   for (int i=0;i<sequence.size();i++){
     outfile<<sequence[i]<<"\t";
   }
-  outfile<<"\n"<<nFrame<<"\n"; //correspond à fitness
+  outfile<<"\n"<<fitness<<"\n"; //correspond à fitness
   outfile.close();
   seqWritten=true;
 }
@@ -332,6 +332,9 @@ void MoustikIA::setGenome(Genome* genome){
 void MoustikIA::setID(string newID){
   id=newID;
 }
+string MoustikIA::getID(){
+  return id;
+}
 void MoustikIA::isActive(bool activate){
   ptrHead->getBody()->SetActive(activate);
   ptrLegL->getBody()->SetActive(activate);
@@ -344,7 +347,7 @@ void MoustikIA::play(b2World* ptrWorld, int nFrame){
     commande(ptrWorld, nFrame);
   }
 }
-void MoustikIA::undertaker(int nFrame){
+bool MoustikIA::undertaker(int nFrame){
   //permet de tester si le moustik et mort
   float limit=2e-2;
   if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
@@ -354,8 +357,9 @@ void MoustikIA::undertaker(int nFrame){
     ptrLegR->getBody()->SetActive(false);
     //on écrit la séquence de jeu dans un fichier texte.
     if (!seqWritten){
-      string filename="../src/"+controlType+"-"+id+".txt";
-      writeGenome(nFrame, filename, true);
+      string filename="../sequences/"+controlType+"-"+id+".txt";
+      writeGenome(genome->getFitness(), filename, true);
     }
   }
+  return dead;
 }

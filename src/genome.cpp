@@ -2,6 +2,21 @@
 #include "moustik.hpp"
 
 /*
+		VARIABLES GLOBALES #########################################################
+*/
+
+extern int fps;
+//IAWORLD
+extern b2World* ptrWorldIAs;
+extern Forme* groundIAs;
+extern Population* HomoSapiens; //les premiers génomes
+extern int nFrameIAs;
+
+/*
+		FONCTIONS ##################################################################
+*/
+
+/*
 SURCHARGES
 */
 
@@ -61,8 +76,11 @@ vector<int> Genome::getAbsoluteSeq(){
   }
   return absoluteSeq;
 }
-int Genome::getFitness(){
+float Genome::getFitness(){
   return fitness;
+}
+void Genome::setFitness(float fit){
+  fitness=fit;
 }
 void Genome::addAbsoluteDate(int nFrame){
   seq.push_back(nFrame-seq.back());
@@ -219,4 +237,23 @@ Population Population::getChildren(int n){
   }
   newGeneration = mutateGroup(newGeneration); // on les fait muter
   return newGeneration;
+}
+void Population::playLive(int nFrame){
+  //a definir et a appeler toute les frames.
+}
+void Population::playOff(){
+  for (int i=0;i<moustiks.size(); i++){
+    moustiks[i]->isActive(true);
+    int frame=0;
+    while (moustiks[i]->undertaker(frame)){
+      //tant que le moustiks est vivant:
+      frame++;
+      ptrWorldIAs->Step((float32)1/fps, (int32)8, (int32)3);
+      moustiks[i]->updateFitness();
+    }
+    moustiks[i]->isActive(false);
+    string filename="../sequences/"+moustiks[i]->getID()+".txt";
+    moustiks[i]->writeGenome(moustiks[i]->getGenome()->getFitness(), filename, true);
+    cout<<100*i/moustiks.size()<<"% - écriture de "<<filename<<endl;
+  }
 }
