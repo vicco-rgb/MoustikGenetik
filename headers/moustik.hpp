@@ -1,4 +1,5 @@
 #pragma once
+
 #ifdef __APPLE__ //OpenGL et GLUT
 #include <OpenGL/gl.h>
 #include <GLUT/GLUT.h>
@@ -6,7 +7,6 @@
 #include <GL/gl.h>
 #include <GL/glut.h>
 #endif
-#include "genome.hpp"
 #include <cmath> // pour cos, sin, tan et M_PI
 #include <iostream> //pour écrire et lire dans un terminal
 #include <fstream> //pour écrire dans un fichier texte
@@ -15,8 +15,9 @@
 #include <vector>
 #include <algorithm> //pour avoir des fonctions utiles avec vector
 #include <Box2D/Box2D.h> //physique
-
 using namespace std;
+
+class Genome;
 
 struct Coord {
   float x;
@@ -31,7 +32,6 @@ Coord operator+(Coord const&, Coord const&);
 Coord operator*(float const&, Coord const&);
 ostream& operator<<(ostream& , const Coord);
 b2Vec2 coord2bvec(Coord);
-
 
 class Forme {
 private:
@@ -72,9 +72,10 @@ protected:
 	float score;
 	float angleMax;
 	string controlType;
-	vector<int> sequence;
+	Genome* genome;
 	bool seqWritten;
 public:
+  //constructeurs
 	Moustik(b2World*, Coord);
 	~Moustik();
 	void commande(b2World*, int);
@@ -85,17 +86,19 @@ public:
 	float getAbs();
 	string getType();
 	GLvoid drawOpenGL();
-	void writeSeqDown(int, string, bool);
+	void writeGenome(int, string, bool);
 };
 
 class MoustikIA : public Moustik {
 protected:
-	vector<int> sequence;
-	int id;
+	string id; //de la forme generation/numero
 public:
-	MoustikIA(b2World*, Coord, Genome, int);
+	MoustikIA(b2World*, Coord, Genome*, int);
 	MoustikIA(b2World*, Coord, vector<int>, int);
+	Genome* getGenome(); //on pourrait rendre cette fonction virtuelle
+  void setGenome(Genome*);
+  void setID(string);
+  void isActive(bool);
 	void play(b2World*, int);
 	virtual void undertaker(int);
-	vector<int> getSeq();
 };

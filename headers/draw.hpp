@@ -6,9 +6,8 @@
 #include <GL/gl.h>
 #include <GL/glut.h>
 #endif
-#include "moustik.hpp"
 #include <Box2D/Box2D.h>
-#include <stdio.h> //permet d'interagie avec le clavier et la souris
+#include <stdio.h> //permet d'interagir avec le clavier et la souris
 
 /*
 		FONCTIONS OPENGL ###########################################################

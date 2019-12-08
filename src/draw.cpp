@@ -1,24 +1,26 @@
 #include "draw.hpp"
+#include "moustik.hpp"
+#include "genome.hpp"
 
 /*
-VARIABLES GLOBALES #########################################################
+VARIABLES GLOBALES #############################################################
 */
 
 extern bool channel; //par défaut, mode de jeu
 extern bool grid;
 //REAL WORLD
 extern b2World* ptrWorld;
-extern Moustik cousin;
-extern Forme ground;
+extern Moustik* cousin;
+extern Forme* ground;
 extern int nFrame;
 //IAWORLD
 extern b2World* ptrWorldIAs;
-extern MoustikIA cousinIA;
-extern Forme groundIAs;
+extern Forme* groundIAs;
+extern Population* HomoSapiens; //les premiers génomes
 extern int nFrameIAs;
 
 /*
-FONCTIONS OPENGL ###########################################################
+FONCTIONS OPENGL ###############################################################
 */
 
 void reshape(GLsizei width, GLsizei height) {
@@ -32,9 +34,9 @@ void reshape(GLsizei width, GLsizei height) {
 	glMatrixMode(GL_PROJECTION);  // To operate on the Projection matrix
 	glLoadIdentity();             // Reset the projection matrix
 	if (width >= height) { //ordre : left, right, bottom, top
-		gluOrtho2D(cousin.getAbs()-2.0* aspect, cousin.getAbs()+4.0 * aspect, -1.0, 5.0); // aspect >= 1, set the height from -1 to 1, with larger width
+		gluOrtho2D(cousin->getAbs()-2.0* aspect, cousin->getAbs()+4.0 * aspect, -1.0, 5.0); // aspect >= 1, set the height from -1 to 1, with larger width
 	} else {
-		gluOrtho2D(cousin.getAbs()-2.0, cousin.getAbs()+4.0, -1.0 / aspect, 5.0 / aspect);// aspect < 1, set the width to -1 to 1, with larger height
+		gluOrtho2D(cousin->getAbs()-2.0, cousin->getAbs()+4.0, -1.0 / aspect, 5.0 / aspect);// aspect < 1, set the width to -1 to 1, with larger height
 	}
 }
 GLvoid drawQuadrillage(int x1,int x2, int y1, int y2){
@@ -69,21 +71,17 @@ GLvoid affichage(){
 	glClear(GL_COLOR_BUFFER_BIT); 	// Effacement du frame buffer
 
 	if (channel) { //vrai monde
-		cousin.drawOpenGL();
-		ground.drawOpenGL();
+		cousin->drawOpenGL();
+		ground->drawOpenGL();
 		glLoadIdentity();
-		gluOrtho2D(cousin.getAbs()-2.0, cousin.getAbs()+4.0, -1.0, 3.0);
+		gluOrtho2D(cousin->getAbs()-2.0, cousin->getAbs()+4.0, -1.0, 3.0);
 	} else {
-		cousinIA.drawOpenGL();
-		groundIAs.drawOpenGL();
-		glLoadIdentity();
-		gluOrtho2D(cousinIA.getAbs()-2.0, cousinIA.getAbs()+4.0, -1.0, 3.0);
-	}
+		groundIAs->drawOpenGL();
 
+	}
 	if (grid){ //affichage de la grille
-		drawQuadrillage(floor(cousin.getAbs())-2,floor(cousin.getAbs())+5,-2,3);
+		drawQuadrillage(floor(cousin->getAbs())-2,floor(cousin->getAbs())+5,-2,3);
 	}
-
 	glutSwapBuffers();
 }
 GLvoid update(int fps){
@@ -93,27 +91,25 @@ GLvoid update(int fps){
 	if (channel){ //on s'interesse au monde IA ou au monde jeu?
 	nFrame++;
 	ptrWorld->Step((float32)1/fps, (int32)8, (int32)3);
-	cousin.undertaker(nFrame); //est-ce que il est mort ?
-	cousin.updateScore();
+	cousin->undertaker(nFrame); //est-ce que il est mort ?
+	cousin->updateScore();
 } else {
 	nFrameIAs++;
 	ptrWorldIAs->Step((float32)1/fps, (int32)8, (int32)3);
-	cousinIA.play(ptrWorldIAs, nFrameIAs);
-	cousinIA.updateScore();
-	cousinIA.undertaker(nFrameIAs);
+	//à revoir;
 }
 glutPostRedisplay();
 }
 GLvoid clavier(unsigned char touche, int x, int y) {
 	switch(touche) {
 		case 's':
-		cousin.commande(ptrWorld, nFrame);
+		cousin->commande(ptrWorld, nFrame);
 		break; //on ne peut commander qu'une seule jambe a la fois.
 		case 'g':
 		grid=!grid;
 		break;
 		case 'i':
-		cousin.reset(ptrWorld);
+		cousin->reset(ptrWorld);
 		break;
 		case 'c':
 		channel=!channel;

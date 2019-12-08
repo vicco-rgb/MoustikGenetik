@@ -1,37 +1,14 @@
 #include "genome.hpp"
-/*
-TEST
-*/
-
-Population testInit(){
-  srand(time(NULL));
-  vector<int> seq1 {1,20,50,60,70};
-  vector<int> seq2 {3,60,80,10,40};
-  vector<int> seq3 {1,10,100,40,20};
-  vector<int> seq4 {30,40,20,90,500};
-
-  Genome *s1 = new Genome(seq1);
-  Genome *s2 = new Genome(seq2);
-  Genome *s3 = new Genome(seq3);
-  Genome *s4 = new Genome(seq4);
-
-  vector<Genome*> listGenomes;
-  listGenomes.push_back(s1);
-  listGenomes.push_back(s2);
-  listGenomes.push_back(s3);
-  listGenomes.push_back(s4);
-  Population pop(listGenomes,0);
-  return pop;
-}
+#include "moustik.hpp"
 
 /*
 SURCHARGES
 */
 
 ostream& operator<<(ostream& os, Population pop){
-  for (int i=0;i<pop.getGenomes().size();i++){
-    //on affiche tous lse génomes les uns après les autres.
-    cout<<"##### GENOME "<<i<<" #####"<<endl<<pop.getGenomes()[i]<<endl;
+  for (int i=0;i<pop.getMoustiks().size();i++){
+    //on affiche tous les génomes les uns après les autres.
+    cout<<"##### GENOME "<<i<<" #####"<<endl<<pop.getMoustiks()[i]->getGenome()<<endl;
   }
   cout<<endl;
   return os;
@@ -55,15 +32,21 @@ GENOME
 Genome::Genome(vector<int> seq) {
   tauxMutation=0.3;
   this->seq=seq;
-  fitness=0;
+  fitness=-1;
+}
+Genome::Genome(int tailleSeq) {
+  //cette fonction fabrique un génome[tailleSeq] aléatoirement
+  for (int i=0; i++; i<tailleSeq){
+    //nombres aléatoires entre 0 et 20;
+    seq.push_back(rand()%20);
+  }
+  fitness=-1;
+  tauxMutation=0.3;
 }
 Genome::Genome() {
   tauxMutation=0.3;
   seq={1};
-  fitness=0;
-  for (int i=0;i<seq.size();i++){
-    fitness+=seq[i];
-  }
+  fitness=-1;
 }
 vector<int> Genome::getRelativeSeq(){
   //retourne une liste d'entiers strictement positifs
@@ -81,8 +64,11 @@ vector<int> Genome::getAbsoluteSeq(){
 int Genome::getFitness(){
   return fitness;
 }
-Genome* Genome::cross(Genome* genome){
-  //cette fonction produit un enfant génome à partir de deux parents
+void Genome::addAbsoluteDate(int nFrame){
+  seq.push_back(nFrame-seq.back());
+}
+Genome* Genome::crossSplit(Genome* genome){
+  //cette fonction produit un enfant génome à partir de deux parents en prenant la première partie du père et la dernière partie de la mère.
   Genome *fils = new Genome();
   int prop = rand()%seq.size(); //prop in [0 taillegenome]
   for (int i=0;i<prop;i++){
@@ -93,7 +79,32 @@ Genome* Genome::cross(Genome* genome){
     //on recopie les seqSize-prop dernières dates de la mère
     fils->seq[j]=genome->seq[j];
   }
-  fils->fitness=0;
+  fils->fitness=-1;
+  return fils;
+}
+Genome* Genome::crossAvg(Genome* genome){
+  //cette fonction produit un enfant génome à partir de deux parents en faisant la moyenne de chaque paire de dates. Cette moyenne est pondérée par le ratio des fitness.
+  Genome *fils = new Genome();
+  vector<int> bigSeq;
+  vector<int> litSeq;
+  float ratio; // fitnessBigSeq/fitnessLitSeq
+  if (seq.size()>=genome->getRelativeSeq().size()){
+    bigSeq = seq;
+    litSeq = genome->getRelativeSeq();
+    ratio = fitness/genome->getFitness();
+  } else {
+    bigSeq = genome->getRelativeSeq();
+    litSeq = seq;
+    ratio = genome->getFitness()/fitness;
+  }
+  for (int i=0; i<litSeq.size(); i++){
+    //moyenne pondérée des dates par le ratio des fitness
+    fils->getRelativeSeq().push_back(bigSeq[i]*ratio + (1-ratio)*litSeq[i]);
+  }
+  for (int j=litSeq.size(); j<bigSeq.size();j++){
+    //on complète sans moyenner avec la séquence qui est plus grande
+    fils->getRelativeSeq().push_back(seq[j]);
+  }
   return fils;
 }
 Genome* Genome::mutation(){
@@ -103,7 +114,7 @@ Genome* Genome::mutation(){
     seq[rand()%seq.size()]=rand()%10;
   }
   mutated->seq=seq;
-  mutated->fitness=0;
+  mutated->fitness=-1;
   for (int i=0;i<mutated->seq.size();i++){
     mutated->fitness+=mutated->seq[i];
   }
@@ -121,21 +132,25 @@ POPULATION
 Population::Population(){
   generation=0;
 }
-Population::Population(vector<Genome*> genomes, int gen){
-  this->genomes=genomes;
+Population::Population(vector<MoustikIA*> nMoustiks, int gen){
+  moustiks=nMoustiks;
+  for (int i=0; i<nMoustiks.size();i++){
+    moustiks[i]->setID("0/"+to_string(i));
+  }
   generation=gen;
 }
 Population::Population(Population *pop){
-  genomes = pop->getGenomes();
+  moustiks = pop->getMoustiks();
   generation = pop->getGeneration();
 }
 Population::~Population(){}
 //getters
-vector<Genome*> Population::getGenomes(){
-  return genomes;
+vector<MoustikIA*> Population::getMoustiks(){
+  return moustiks;
 }
-void Population::addGenome(Genome* nGenome){
-  genomes.push_back(nGenome);
+void Population::addMoustik(MoustikIA* moustik){
+  moustik->setID(to_string(generation)+"/"+to_string(moustiks.size()));
+  moustiks.push_back(moustik);
 }
 int Population::getGeneration(){
   return generation;
@@ -143,57 +158,64 @@ int Population::getGeneration(){
 //reproduction
 Population Population::bests(int n){
   int best=0;
-  //on trie toute la liste des genomes selon leur fitness
-  for(int i=0;i<genomes.size()-1;i++){
-    Genome *tmp = new Genome();
+  //on trie les moustiks selon leur fitness
+  for(int i=0;i<moustiks.size()-1;i++){
+    MoustikIA* tmp;
     best=i;
-    for(int j=i+1;j<genomes.size();j++){
-      if (genomes[j]->betterThan(genomes[best])){
+    for(int j=i+1;j<moustiks.size();j++){
+      if (moustiks[j]->getGenome()->betterThan(moustiks[best]->getGenome())){
         best=j;
       }
       if (best!=i){
-        *tmp=*genomes[i];
-        *genomes[i]=*genomes[best];
-        *genomes[best]=*tmp;
+        //alors on intervertit le moustik[i] et le moustik[best]
+        tmp=moustiks[i];
+        moustiks[i]=moustiks[best];
+        moustiks[best]=tmp;
       }
     }
   }
   //on récupère les n premiers
-  vector<Genome*> bestGens;
-  for (vector<Genome*>::iterator it = genomes.begin(); *it != genomes[n]; ++it){
-    bestGens.push_back(*it);
+  vector<MoustikIA*> bestMoustiks;
+  int i=0;
+  while (bestMoustiks.size()<n){
+    bestMoustiks.push_back(moustiks[i]);
   }
-  return Population(bestGens, generation);
+  return Population(bestMoustiks, generation);
 }
 Population Population::reproduction(Population pop){
-  int size=pop.getGenomes().size();
-  vector<Genome*> childGenomes = pop.getGenomes();
+  int size=pop.getMoustiks().size();
+  vector<MoustikIA*> children = pop.getMoustiks();
   for (int i=0;i<size;i++){
     //on cherche un papa et une maman pour l'enfant.
     int dad=rand()%size;
     int mom=rand()%size;
-    while (dad==mom){ //first et second doivent être différents.
+    while (dad==mom){
+      //first et second doivent être différents.
       mom=rand()%size;
     }
-    childGenomes[i]=pop.getGenomes()[dad]->cross(pop.getGenomes()[mom]);
+    children[i]->setGenome(pop.getMoustiks()[dad]->getGenome()->crossAvg(pop.getMoustiks()[mom]->getGenome()));
   }
-  return Population(childGenomes, pop.getGeneration());
+  return Population(children, pop.getGeneration()+1);
 }
 Population Population::mutateGroup(Population pop){
-  vector<Genome*> gensMutated = pop.getGenomes();
-  for (int i=0; i<pop.getGenomes().size();i++){
-    gensMutated[i]=pop.getGenomes()[i]->mutation();
+  vector<MoustikIA*> mutatedMoustiks = pop.getMoustiks();
+  for (int i=0; i<pop.getMoustiks().size();i++){
+    pop.getMoustiks()[i]->setGenome(pop.getMoustiks()[i]->getGenome()->mutation());
+    mutatedMoustiks[i]=pop.getMoustiks()[i];
   }
-  return Population(gensMutated, pop.getGeneration());
+  return Population(mutatedMoustiks, pop.getGeneration());
 }
 Population Population::getChildren(int n){
   //cette fonction renvoie une population correspondant aux enfants issus des nmeilleurs parents de la population manipulée.
   //La population manipulée n'est pas écrasée
+  if (n>moustiks.size()){ //pour ne pas faire planter l'algorithme
+    n=moustiks.size();
+  }
   Population bestPop = bests(n); //les trouve les n meilleurs parents
-  Population newGeneration = reproduction(bestPop); //on récupère les n enfants
-  while (newGeneration.getGenomes().size()<genomes.size()){
-    //on recrée une population de la taille originale en complétant parmis les meilleurs parents.
-    newGeneration.addGenome(bestPop.getGenomes()[rand()%n]);
+  Population newGeneration = reproduction(bestPop); //on récupère les n enfants (incrémente generation)
+  while (newGeneration.getMoustiks().size()<moustiks.size()){
+    //on recrée une population de la taille originale en complétant avec les meilleurs parents.
+    newGeneration.addMoustik(bestPop.getMoustiks()[rand()%n]);
   }
   newGeneration = mutateGroup(newGeneration); // on les fait muter
   return newGeneration;

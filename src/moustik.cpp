@@ -1,6 +1,15 @@
 #include "moustik.hpp"
+#include "genome.hpp"
+
 /*
-STRUCTURES #################################################################
+VARIABLES GLOBALES##############################################################
+*/
+
+extern int nFrame;
+extern int nFrameIAs;
+
+/*
+STRUCTURES #####################################################################
 */
 
 Coord::Coord(){
@@ -186,7 +195,7 @@ Moustik::Moustik(b2World* ptrWorld, Coord pos){
 }
 Moustik::~Moustik(){}
 void Moustik::commande(b2World* ptrWorld, int nFrame){
-  sequence.push_back(nFrame);
+  genome->addAbsoluteDate(nFrame);
   com=1+com%2;
   float minTorque=5;
   float maxTorque=50;
@@ -221,7 +230,7 @@ void Moustik::undertaker(int nFrame){
     ptrLegR->getBody()->SetActive(false);
     dead=true;
     if (!seqWritten){
-      writeSeqDown(ptrHead->getPos().x, "../src/"+controlType+".txt", false);
+      writeGenome(ptrHead->getPos().x, "../src/"+controlType+".txt", false);
     }
   }
 }
@@ -287,8 +296,9 @@ GLvoid Moustik::drawOpenGL(){
     }
   }
 }
-void Moustik::writeSeqDown(int fitness, string filename, bool erase){
+void Moustik::writeGenome(int fitness, string filename, bool erase){
   //on écrit la séquence de jeu dans un fichier texte.
+  vector<int> sequence=genome->getRelativeSeq();
   ofstream outfile;
   if (erase) { // on écrase le fichier actuel
     outfile.open(filename, ios_base::ate);
@@ -303,18 +313,33 @@ void Moustik::writeSeqDown(int fitness, string filename, bool erase){
   seqWritten=true;
 }
 
-MoustikIA::MoustikIA(b2World* ptrWorld, Coord pos, Genome genome, int id) : Moustik(ptrWorld, pos){
+MoustikIA::MoustikIA(b2World* ptrWorld, Coord pos, Genome* genome, int id) : Moustik(ptrWorld, pos){
   this->id=id;
   controlType="IA";
-  sequence=genome.getAbsoluteSeq();
+  this->genome=genome;
 }
 MoustikIA::MoustikIA(b2World* ptrWorld, Coord pos, vector<int> seq, int id) : Moustik(ptrWorld, pos){
   this->id=id;
   controlType="IA";
-  sequence=seq;
+  genome = new Genome(seq);
+}
+Genome* MoustikIA::getGenome(){
+  return genome;
+}
+void MoustikIA::setGenome(Genome* genome){
+  this->genome=genome;
+}
+void MoustikIA::setID(string newID){
+  id=newID;
+}
+void MoustikIA::isActive(bool activate){
+  ptrHead->getBody()->SetActive(activate);
+  ptrLegL->getBody()->SetActive(activate);
+  ptrLegR->getBody()->SetActive(activate);
 }
 void MoustikIA::play(b2World* ptrWorld, int nFrame){
   //fonction appelée a toutes les frames
+  vector<int> sequence = genome->getAbsoluteSeq();
   if (count(sequence.begin(), sequence.end(), nFrame)==1){
     commande(ptrWorld, nFrame);
   }
@@ -329,11 +354,8 @@ void MoustikIA::undertaker(int nFrame){
     ptrLegR->getBody()->SetActive(false);
     //on écrit la séquence de jeu dans un fichier texte.
     if (!seqWritten){
-      string filename="../src/"+controlType+"-"+to_string(id)+".txt";
-      writeSeqDown(nFrame, filename, true);
+      string filename="../src/"+controlType+"-"+id+".txt";
+      writeGenome(nFrame, filename, true);
     }
   }
-}
-vector<int> MoustikIA::getSeq(){
-  return sequence;
 }

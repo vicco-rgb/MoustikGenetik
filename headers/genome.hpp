@@ -4,37 +4,43 @@
 #include <cmath>
 #include <ctime>
 #include <iostream>
+#include <string> //permet de convertir entier en string
 using namespace std;
+
+class MoustikIA;
 
 class Genome {
 private:
-  int fitness;
+  int fitness; //vaut -1 quand la séquence n'a pas encore été testée
   vector<int> seq; //correspond à la durée pendant laquelle le moustik est resté sur la même jambe.
   float tauxMutation;
 public:
   Genome(vector<int>);
+  Genome(int);
   Genome();
   ~Genome(){};
   vector<int> getRelativeSeq();
   vector<int> getAbsoluteSeq();
   int getFitness();
-  Genome* cross(Genome*);
+  void addAbsoluteDate(int);
+  Genome* crossSplit(Genome*);
+  Genome* crossAvg(Genome*);
   Genome* mutation();
   bool betterThan(Genome*);
 };
 
 class Population {
 private:
-  vector<Genome*> genomes;
+  vector<MoustikIA*> moustiks;
   int generation;
 public:
   Population();
-  Population(vector<Genome*>, int);
+  Population(vector<MoustikIA*>, int);
   Population(Population*);
   ~Population();
 
-  vector<Genome*> getGenomes();
-  void addGenome(Genome*);
+  vector<MoustikIA*> getMoustiks();
+  void addMoustik(MoustikIA*);
   int getGeneration();
 
   Population bests(int);
