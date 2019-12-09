@@ -6,7 +6,14 @@ Notre projet consiste en l'application d'un ou de plusieurs algorithmes généti
 
 [//]: # (<iframe width="560" height="315" src="https://www.youtube.com/embed/noNl_cvYLu8" frameborder="0" allow="accelerometer autoplay encrypted-media gyroscope picture-in-picture" allowfullscreen></iframe>)
 
-## Diagramme de classe
+## Explication générale du code
+Le but de notre algorithme est de générer
+### Diagramme de classe
+Les différentes classes existant dans notre code sont:
++ `Forme` cette classe correspond à un rectangle physique. Cette classe contient un attribut `b2Body* body` issu de la librairie moteur physique `Box2D`. La classe forme permet d'automatiser la création de boîtes physiques et facilite l'écriture des fonctions d'affichage de ces formes sous `OpenGL`.
++ `Genome`
++ `Moustik` cette classe correspond au concept de notre animal bipède. Il possède trois attributs `Forme`, correspondant à sa tête et à ses deux jambes.
+
 `-` public
 `+` private
 `#` protected

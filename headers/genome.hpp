@@ -4,6 +4,7 @@
 #include <cmath>
 #include <ctime>
 #include <iostream>
+#include <istream> //permet de lire des fichiers
 #include <string> //permet de convertir entier en string
 using namespace std;
 
@@ -15,7 +16,7 @@ private:
   vector<int> seq; //correspond à la durée pendant laquelle le moustik est resté sur la même jambe.
   float tauxMutation;
 public:
-  Genome(vector<int>);
+  Genome(vector<int>, float); //sequence et fitness (mettre -1 par défaut.)
   Genome(int);
   Genome();
   ~Genome(){};
@@ -43,6 +44,7 @@ public:
   vector<MoustikIA*> getMoustiks();
   void addMoustik(MoustikIA*);
   int getGeneration();
+  void setGeneration(int);
 
   Population bests(int);
   Population reproduction(Population);
@@ -53,6 +55,7 @@ public:
   void playOff();
 
   void writeGenomes();
+  vector<Genome*> readGenomes(string);
 };
 
 //surcharge de l'opérateur cout

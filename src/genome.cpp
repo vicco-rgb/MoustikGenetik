@@ -2,7 +2,7 @@
 #include "moustik.hpp"
 
 /*
-		VARIABLES GLOBALES #########################################################
+VARIABLES GLOBALES #########################################################
 */
 
 extern int fps;
@@ -13,7 +13,7 @@ extern Population* HomoSapiens; //les premiers génomes
 extern int nFrameIAs;
 
 /*
-		FONCTIONS ##################################################################
+FONCTIONS ##################################################################
 */
 
 /*
@@ -40,14 +40,12 @@ ostream& operator<<(ostream& os, vector<int> seq){
   return os;
 }
 
-/*
-GENOME
-*/
+// GENOME
 
-Genome::Genome(vector<int> seq) {
+Genome::Genome(vector<int> seq, float fitness) {
   tauxMutation=0.3;
   this->seq=seq;
-  fitness=-1;
+  this->fitness=fitness;
 }
 Genome::Genome(int tailleSeq) {
   //cette fonction fabrique un génome[tailleSeq] aléatoirement
@@ -145,9 +143,7 @@ bool Genome::betterThan(Genome* genome){
   return (fitness > genome->fitness);
 }
 
-/*
-POPULATION
-*/
+//POPULATION
 
 //constructeurs-destructeurs
 Population::Population(){
@@ -175,6 +171,9 @@ void Population::addMoustik(MoustikIA* moustik){
 }
 int Population::getGeneration(){
   return generation;
+}
+void Population::setGeneration(int gen){
+  generation=gen;
 }
 //reproduction
 Population Population::bests(int n){
@@ -230,16 +229,16 @@ Population Population::getChildren(int n){
   //cette fonction renvoie une population correspondant aux enfants issus des nmeilleurs parents de la population manipulée.
   //La population manipulée n'est pas écrasée
   if (n>moustiks.size()){ //pour ne pas faire planter l'algorithme
-    n=moustiks.size();
-  }
-  Population bestPop = bests(n); //les trouve les n meilleurs parents
-  Population newGeneration = reproduction(bestPop); //on récupère les n enfants (incrémente generation)
-  while (newGeneration.getMoustiks().size()<moustiks.size()){
-    //on recrée une population de la taille originale en complétant avec les meilleurs parents.
-    newGeneration.addMoustik(bestPop.getMoustiks()[rand()%n]);
-  }
-  newGeneration = mutateGroup(newGeneration); // on les fait muter
-  return newGeneration;
+  n=moustiks.size();
+}
+Population bestPop = bests(n); //les trouve les n meilleurs parents
+Population newGeneration = reproduction(bestPop); //on récupère les n enfants (incrémente generation)
+while (newGeneration.getMoustiks().size()<moustiks.size()){
+  //on recrée une population de la taille originale en complétant avec les meilleurs parents.
+  newGeneration.addMoustik(bestPop.getMoustiks()[rand()%n]);
+}
+newGeneration = mutateGroup(newGeneration); // on les fait muter
+return newGeneration;
 }
 void Population::playLive(int nFrame){
   //a definir et a appeler toute les frames.
@@ -269,4 +268,50 @@ void Population::writeGenomes(){
     outfile<<endl<<moustiks[i]->getGenome()->getFitness()<<endl;
   }
   outfile.close();
+}
+vector<Genome*> Population::readGenomes(string filename){
+  //filename doit être de la forme "generationXXX"
+  //on prend le numéro de génération à partir du filename en convertissant string2int (stoi)
+  vector<Genome*> out;
+
+  ifstream fichier(filename); //open file
+  if (!fichier) { //si tout vas bien (fichier ouver et non vide...)
+    cout << "Erreur à l'ouverture du fichier " << filename << endl;
+  }
+
+  while (fichier.eof()){
+    string lineFit, lineSeq;
+    vector<int> sequence;
+    float fitness;
+    int sep;
+
+    string seqtxt, fitxt;
+    while(getline(fichier, seqtxt)){
+      getline(fichier, fitxt);
+      //extraire des strings, les dates.
+      seqtxt="";
+      fitxt="";
+    }
+
+
+
+
+
+    //SEQUENCE
+    getline(fichier, lineSeq); //renvoie première ligne
+    sep=lineSeq.find('\t');
+    while(sep!=-1){ //tant qu'il en trouve
+      sequence.push_back(stoi(lineSeq.substr(0, sep-1))); //on copie la section sans le '\t'
+      lineSeq=lineSeq.substr(sep, lineSeq.size()); //on édite la ligne.
+      sep=lineSeq.find('\t');
+    }
+
+    //FITNESS
+    getline(fichier, lineFit); //renvoie deuxième ligne
+    fitness=stof(lineFit);
+    out.push_back(new Genome(sequence, fitness));
+  }
+
+  fichier.close();
+
 }

@@ -166,9 +166,9 @@ Moustik::Moustik(b2World* ptrWorld, Coord pos){
   seqWritten=false;
   genome= new Genome();
   //définition des formes
-  ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
-  ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
-  ptrLegR = new Forme(ptrWorld, pos+Coord(0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
+  ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5, densité 1
+  ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1, densité 1
+  ptrLegR = new Forme(ptrWorld, pos+Coord(0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1, densité 1.5
   //définition de la rotuleL et rotuleR
   b2RevoluteJointDef defRotuleL;
   b2RevoluteJointDef defRotuleR;
@@ -245,9 +245,9 @@ void Moustik::reset(b2World* ptrWorld){
   dead = false;
   //definition of bodies
   Coord pos(0, 2);
-  ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
-  ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
-  ptrLegR = new Forme(ptrWorld, pos+Coord(0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1
+  ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0, 1.0); //tête dynamique de 0.5x0.5
+  ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0, 1.0); //jambe dynamique de 0.1x1
+  ptrLegR = new Forme(ptrWorld, pos+Coord(0.25,-0.75), 0.05, 0.5, 0, 1.5); //jambe dynamique de 0.1x1
   //définition de la rotuleL et rotuleR
   b2RevoluteJointDef defRotuleL;
   b2RevoluteJointDef defRotuleR;
@@ -319,7 +319,7 @@ MoustikIA::MoustikIA(b2World* ptrWorld, Coord pos, Genome* genome, string id) : 
 MoustikIA::MoustikIA(b2World* ptrWorld, Coord pos, vector<int> seq, string id) : Moustik(ptrWorld, pos){
   this->id=id;
   controlType="IA";
-  genome = new Genome(seq);
+  genome = new Genome(seq, -1);
 }
 Genome* MoustikIA::getGenome(){
   return genome;
