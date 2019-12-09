@@ -79,6 +79,7 @@ public:
 	~Moustik();
 	void commande(b2World*, int);
 	Coord getPos();
+  bool isDead();
 	virtual bool undertaker(int);
 	void updateFitness();
 	void reset(b2World*);
@@ -98,7 +99,7 @@ public:
   void setGenome(Genome*);
   void setID(string);
   string getID();
-  void isActive(bool);
+  void activation(bool);
 	void play(b2World*, int);
 	virtual bool undertaker(int);
 };

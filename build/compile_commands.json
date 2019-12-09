@@ -1,22 +1,22 @@
 [
 {
-  "directory": "/media/DossierPartage/vicloud/P1RV/build",
-  "command": "/usr/bin/c++   -I/media/DossierPartage/vicloud/P1RV/headers  -g   -o CMakeFiles/exec.dir/src/draw.cpp.o -c /media/DossierPartage/vicloud/P1RV/src/draw.cpp",
-  "file": "/media/DossierPartage/vicloud/P1RV/src/draw.cpp"
+  "directory": "/mnt/MainVolume/Drive/P1RV/build",
+  "command": "/usr/bin/c++   -I/mnt/MainVolume/Drive/P1RV/headers  -g   -o CMakeFiles/exec.dir/src/draw.cpp.o -c /mnt/MainVolume/Drive/P1RV/src/draw.cpp",
+  "file": "/mnt/MainVolume/Drive/P1RV/src/draw.cpp"
 },
 {
-  "directory": "/media/DossierPartage/vicloud/P1RV/build",
-  "command": "/usr/bin/c++   -I/media/DossierPartage/vicloud/P1RV/headers  -g   -o CMakeFiles/exec.dir/src/genome.cpp.o -c /media/DossierPartage/vicloud/P1RV/src/genome.cpp",
-  "file": "/media/DossierPartage/vicloud/P1RV/src/genome.cpp"
+  "directory": "/mnt/MainVolume/Drive/P1RV/build",
+  "command": "/usr/bin/c++   -I/mnt/MainVolume/Drive/P1RV/headers  -g   -o CMakeFiles/exec.dir/src/genome.cpp.o -c /mnt/MainVolume/Drive/P1RV/src/genome.cpp",
+  "file": "/mnt/MainVolume/Drive/P1RV/src/genome.cpp"
 },
 {
-  "directory": "/media/DossierPartage/vicloud/P1RV/build",
-  "command": "/usr/bin/c++   -I/media/DossierPartage/vicloud/P1RV/headers  -g   -o CMakeFiles/exec.dir/src/main.cpp.o -c /media/DossierPartage/vicloud/P1RV/src/main.cpp",
-  "file": "/media/DossierPartage/vicloud/P1RV/src/main.cpp"
+  "directory": "/mnt/MainVolume/Drive/P1RV/build",
+  "command": "/usr/bin/c++   -I/mnt/MainVolume/Drive/P1RV/headers  -g   -o CMakeFiles/exec.dir/src/main.cpp.o -c /mnt/MainVolume/Drive/P1RV/src/main.cpp",
+  "file": "/mnt/MainVolume/Drive/P1RV/src/main.cpp"
 },
 {
-  "directory": "/media/DossierPartage/vicloud/P1RV/build",
-  "command": "/usr/bin/c++   -I/media/DossierPartage/vicloud/P1RV/headers  -g   -o CMakeFiles/exec.dir/src/moustik.cpp.o -c /media/DossierPartage/vicloud/P1RV/src/moustik.cpp",
-  "file": "/media/DossierPartage/vicloud/P1RV/src/moustik.cpp"
+  "directory": "/mnt/MainVolume/Drive/P1RV/build",
+  "command": "/usr/bin/c++   -I/mnt/MainVolume/Drive/P1RV/headers  -g   -o CMakeFiles/exec.dir/src/moustik.cpp.o -c /mnt/MainVolume/Drive/P1RV/src/moustik.cpp",
+  "file": "/mnt/MainVolume/Drive/P1RV/src/moustik.cpp"
 }
 ]

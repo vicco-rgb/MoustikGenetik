@@ -12,24 +12,19 @@ extern Forme* groundIAs;
 extern Population* HomoSapiens; //les premiers génomes
 extern int nFrameIAs;
 
-/*
-FONCTIONS ##################################################################
-*/
-
-/*
-SURCHARGES
-*/
+//FONCTIONS ##################################################################
+//SURCHARGES
 
 ostream& operator<<(ostream& os, Population pop){
   for (int i=0;i<pop.getMoustiks().size();i++){
     //on affiche tous les génomes les uns après les autres.
-    cout<<"##### GENOME "<<i<<" #####"<<endl<<pop.getMoustiks()[i]->getGenome()<<endl;
+    cout<<"##### GENOME "<<i<<" #####"<<endl<<*(pop.getMoustiks()[i]->getGenome())<<endl;
   }
   cout<<endl;
   return os;
 }
-ostream& operator<<(ostream& os, Genome *genome){
-  cout<<genome->getAbsoluteSeq()<<endl;
+ostream& operator<<(ostream& os, Genome genome){
+  cout<<genome.getAbsoluteSeq()<<endl;
   return os;
 }
 ostream& operator<<(ostream& os, vector<int> seq){
@@ -41,7 +36,7 @@ ostream& operator<<(ostream& os, vector<int> seq){
 }
 
 // GENOME
-
+//constructeurs
 Genome::Genome(vector<int> seq, float fitness) {
   tauxMutation=0.3;
   this->seq=seq;
@@ -60,6 +55,7 @@ Genome::Genome(){
   tauxMutation=0.3;
   fitness=-1;
 }
+//get-set
 vector<int> Genome::getRelativeSeq(){
   //retourne une liste d'entiers strictement positifs
   return seq;
@@ -86,6 +82,7 @@ void Genome::addAbsoluteDate(int nFrame){
   }
   seq.push_back(nFrame-previous);
 }
+//mutation
 Genome* Genome::crossSplit(Genome* genome){
   //cette fonction produit un enfant génome à partir de deux parents en prenant la première partie du père et la dernière partie de la mère.
   Genome *fils = new Genome();
@@ -175,7 +172,7 @@ int Population::getGeneration(){
 void Population::setGeneration(int gen){
   generation=gen;
 }
-//reproduction
+//mutation
 Population Population::bests(int n){
   int best=0;
   //on trie les moustiks selon leur fitness
@@ -240,12 +237,22 @@ while (newGeneration.getMoustiks().size()<moustiks.size()){
 newGeneration = mutateGroup(newGeneration); // on les fait muter
 return newGeneration;
 }
-void Population::playLive(int nFrame){
-  //a definir et a appeler toute les frames.
+MoustikIA* Population::playLive(int nFrame){
+  for (int i=0; i<moustiks.size(); i++){
+    if (!moustiks[i]->isDead()){
+      //on trouve le premier vivant
+      moustiks[i]->activation(true);
+      return moustiks[i];
+    } else {
+      //on désactive tous les précédents.
+      moustiks[i]->activation(false);
+    }
+  }
+  return moustiks.back();
 }
 void Population::playOff(){
   for (int i=0;i<moustiks.size(); i++){
-    moustiks[i]->isActive(true);
+    moustiks[i]->activation(true);
     int frame=0;
     while (moustiks[i]->undertaker(frame)){
       //tant que le moustiks est vivant:
@@ -253,7 +260,7 @@ void Population::playOff(){
       ptrWorldIAs->Step((float32)1/fps, (int32)8, (int32)3);
       moustiks[i]->updateFitness();
     }
-    moustiks[i]->isActive(false);
+    moustiks[i]->activation(false);
   }
 }
 void Population::writeGenomes(){
@@ -273,45 +280,25 @@ vector<Genome*> Population::readGenomes(string filename){
   //filename doit être de la forme "generationXXX"
   //on prend le numéro de génération à partir du filename en convertissant string2int (stoi)
   vector<Genome*> out;
-
   ifstream fichier(filename); //open file
   if (!fichier) { //si tout vas bien (fichier ouver et non vide...)
     cout << "Erreur à l'ouverture du fichier " << filename << endl;
   }
-
   while (fichier.eof()){
-    string lineFit, lineSeq;
-    vector<int> sequence;
-    float fitness;
-    int sep;
-
     string seqtxt, fitxt;
+    vector<int> sequence;
     while(getline(fichier, seqtxt)){
+      //on écrit la séquence
+      string datestr;
+      while(seqtxt.find('\t')!=-1){
+        datestr=seqtxt.substr(seqtxt.find('\t')-1);
+        sequence.push_back(stoi(datestr));
+        seqtxt=seqtxt.substr(seqtxt.find('\t')+1, seqtxt.size());
+      }
       getline(fichier, fitxt);
-      //extraire des strings, les dates.
-      seqtxt="";
-      fitxt="";
     }
-
-
-
-
-
-    //SEQUENCE
-    getline(fichier, lineSeq); //renvoie première ligne
-    sep=lineSeq.find('\t');
-    while(sep!=-1){ //tant qu'il en trouve
-      sequence.push_back(stoi(lineSeq.substr(0, sep-1))); //on copie la section sans le '\t'
-      lineSeq=lineSeq.substr(sep, lineSeq.size()); //on édite la ligne.
-      sep=lineSeq.find('\t');
-    }
-
-    //FITNESS
-    getline(fichier, lineFit); //renvoie deuxième ligne
-    fitness=stof(lineFit);
-    out.push_back(new Genome(sequence, fitness));
+    out.push_back(new Genome(sequence, stof(fitxt)));
+    fichier.close();
   }
-
-  fichier.close();
-
+  return out;
 }

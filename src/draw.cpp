@@ -6,6 +6,7 @@
 VARIABLES GLOBALES #############################################################
 */
 
+float abscisse=0;
 extern bool channel; //par défaut, mode de jeu
 extern bool grid;
 //REAL WORLD
@@ -16,6 +17,7 @@ extern int nFrame;
 //IAWORLD
 extern b2World* ptrWorldIAs;
 extern Forme* groundIAs;
+MoustikIA* cousinIA;
 extern Population* HomoSapiens; //les premiers génomes
 extern int nFrameIAs;
 
@@ -34,9 +36,9 @@ void reshape(GLsizei width, GLsizei height) {
 	glMatrixMode(GL_PROJECTION);  // To operate on the Projection matrix
 	glLoadIdentity();             // Reset the projection matrix
 	if (width >= height) { //ordre : left, right, bottom, top
-		gluOrtho2D(cousin->getAbs()-2.0* aspect, cousin->getAbs()+4.0 * aspect, -1.0, 5.0); // aspect >= 1, set the height from -1 to 1, with larger width
+		gluOrtho2D(abscisse-2.0* aspect, abscisse+4.0 * aspect, -1.0, 5.0); // aspect >= 1, set the height from -1 to 1, with larger width
 	} else {
-		gluOrtho2D(cousin->getAbs()-2.0, cousin->getAbs()+4.0, -1.0 / aspect, 5.0 / aspect);// aspect < 1, set the width to -1 to 1, with larger height
+		gluOrtho2D(abscisse-2.0, abscisse+4.0, -1.0 / aspect, 5.0 / aspect);// aspect < 1, set the width to -1 to 1, with larger height
 	}
 }
 GLvoid drawQuadrillage(int x1,int x2, int y1, int y2){
@@ -74,13 +76,14 @@ GLvoid affichage(){
 		cousin->drawOpenGL();
 		ground->drawOpenGL();
 		glLoadIdentity();
-		gluOrtho2D(cousin->getAbs()-2.0, cousin->getAbs()+4.0, -1.0, 3.0);
+		gluOrtho2D(abscisse-2.0, abscisse+4.0, -1.0, 3.0);
 	} else {
 		groundIAs->drawOpenGL();
+		cousinIA->drawOpenGL();
 		//faire passer les moustiks les uns après les autres.
 	}
 	if (grid){ //affichage de la grille
-		drawQuadrillage(floor(cousin->getAbs())-2,floor(cousin->getAbs())+5,-2,3);
+		drawQuadrillage(floor(abscisse)-2,floor(abscisse)+5,-2,3);
 	}
 	glutSwapBuffers();
 }
@@ -88,17 +91,22 @@ GLvoid update(int fps){
 	int dt=floor(1000/fps); //dt=16ms pour 60fps
 	glutTimerFunc(dt, update, fps);
 	//le jeu se met en pause lorsque l'on change de channel
-	if (channel){ //on s'interesse au monde IA ou au monde jeu?
-	nFrame++;
-	ptrWorld->Step((float32)1/fps, (int32)8, (int32)3);
-	cousin->undertaker(nFrame); //est-ce que il est mort ?
-	cousin->updateFitness();
-} else {
-	nFrameIAs++;
-	ptrWorldIAs->Step((float32)1/fps, (int32)8, (int32)3);
-	//à revoir;
-}
-glutPostRedisplay();
+	if (channel){
+		//on s'interesse au monde IA ou au monde jeu?
+		nFrame++;
+		ptrWorld->Step((float32)1/fps, (int32)8, (int32)3);
+		cousin->undertaker(nFrame); //est-ce que il est mort ?
+		cousin->updateFitness();
+		abscisse=cousin->getAbs();
+	} else {
+		nFrameIAs++;
+		ptrWorldIAs->Step((float32)1/fps, (int32)8, (int32)3);
+		cousinIA=HomoSapiens->playLive(nFrameIAs);
+		cousinIA->undertaker(nFrameIAs);
+		cousinIA->updateFitness();
+		abscisse=cousinIA->getAbs();
+	}
+	glutPostRedisplay();
 }
 GLvoid clavier(unsigned char touche, int x, int y) {
 	switch(touche) {

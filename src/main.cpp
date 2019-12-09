@@ -54,17 +54,20 @@ void Init(){
 	nFrame=0;
 
 	//IA WORLD
-
 	ptrWorldIAs = new b2World(b2Vec2(0.0f,-9.81f));
 	groundIAs = new Forme(ptrWorldIAs, Coord(0.0,-1.0), 100.0, 1.0, 1); //! peut-être trop court !
 	HomoSapiens = new Population();
-
 	for (int i=0; i<50; i++){
 		Genome* genomeIA = new Genome(40);
+		cout<<Genome(40)<<endl;
 		MoustikIA* cousinIA = new MoustikIA(ptrWorldIAs, Coord(0.0,3.0), genomeIA, to_string(i));
-		cousinIA->isActive(false); //on rend le moustik inactif
+		cousinIA->activation(false); //on rend le moustik inactif
 		HomoSapiens->addMoustik(cousinIA);
 	}
+	Genome* affgen=HomoSapiens->getMoustiks()[0]->getGenome();
+	cout<<*affgen<<endl;
+	cout<<"Init1"<<endl;
+
 }
 
 /*
@@ -76,11 +79,13 @@ int main(int argc, char** argv){
 	B2_NOT_USED(argv);
 	srand(time(0));
 
+	cout<<Genome(40)<<endl;
+	cout<<"non"<<endl;
 	Init(); 	//définition des variables.
 
 	HomoSapiens->playOff();
 	HomoSapiens->writeGenomes();
-	
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);	// Choix du mode d'affichage (ici RVB)
 	glutInitWindowPosition(0,0); // Position initiale de la fenetre GLUT

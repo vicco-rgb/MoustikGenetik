@@ -1,16 +1,12 @@
 #include "moustik.hpp"
 #include "genome.hpp"
 
-/*
-VARIABLES GLOBALES##############################################################
-*/
+//VARIABLES GLOBALES############################################################
 
 extern int nFrame;
 extern int nFrameIAs;
 
-/*
-STRUCTURES #####################################################################
-*/
+//STRUCTURES ###################################################################
 
 Coord::Coord(){
   x=0;
@@ -60,6 +56,8 @@ b2Vec2 coord2bvec(Coord pos){
   return cpos;
 }
 
+//FORME
+//constructeurs
 Forme::Forme(b2World* ptrWorld, Coord pos, float w, float h, int type){
   b2BodyDef bodyDef;
 
@@ -95,6 +93,7 @@ Forme::Forme(b2World* ptrWorld, Coord pos, int type){
 Forme::~Forme(){
   body->GetWorld()->DestroyBody( body );
 }
+//get-set
 float Forme::getX(){
   return body->GetPosition().x;
 }
@@ -129,6 +128,7 @@ Coord Forme::getTL(){
 Coord Forme::getTR(){
   return Coord(getX()+diag*cos(angleIn+getAngle()), getY()+diag*sin(angleIn+getAngle()));
 }
+//draw
 GLvoid Forme::drawOpenGL(){
   //dessine le rectangle dans une couleur blanc pale par défaut
   glBegin(GL_QUADS);
@@ -158,17 +158,19 @@ GLvoid Forme::drawOpenGL(float r, float g, float b){
   glFlush();
 }
 
+//MOUSTIK
+//constructeurs
 Moustik::Moustik(b2World* ptrWorld, Coord pos){
   com = 0;
   dead=false;
-  angleMax = 5*M_PI/6;
+  angleMax = 3*M_PI/8;
   controlType="human";
   seqWritten=false;
   genome= new Genome();
   //définition des formes
   ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5, densité 1
-  ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1, densité 1
-  ptrLegR = new Forme(ptrWorld, pos+Coord(0.25,-0.75), 0.05, 0.5, 0); //jambe dynamique de 0.1x1, densité 1.5
+  ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-1.05), 0.05, 0.8, 0); //jambe dynamique de 0.1x1, densité 1
+  ptrLegR = new Forme(ptrWorld, pos+Coord(0.25,-1.05), 0.05, 0.8, 0); //jambe dynamique de 0.1x1, densité 1.5
   //définition de la rotuleL et rotuleR
   b2RevoluteJointDef defRotuleL;
   b2RevoluteJointDef defRotuleR;
@@ -191,50 +193,17 @@ Moustik::Moustik(b2World* ptrWorld, Coord pos){
   rotuleR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defRotuleR );
 }
 Moustik::~Moustik(){}
-void Moustik::commande(b2World* ptrWorld, int nFrame){
-  genome->addAbsoluteDate(nFrame);
-  com=1+com%2;
-  float minTorque=5;
-  float maxTorque=50;
-  if (dead) { //on tue tout.
-    rotuleL->EnableMotor(false);
-    rotuleR->EnableMotor(false);
-  }	else if (com==1){
-    rotuleL->EnableMotor(true);
-    rotuleL->SetMotorSpeed(M_PI/2); //1/4 de tour par seconde
-    rotuleL->SetMaxMotorTorque(maxTorque);
-    rotuleR->EnableMotor(true);
-    rotuleR->SetMotorSpeed(-M_PI/2);
-    rotuleR->SetMaxMotorTorque(minTorque);
-  } else if (com==2){
-    rotuleR->EnableMotor(true);
-    rotuleR->SetMotorSpeed(M_PI/2);
-    rotuleR->SetMaxMotorTorque(maxTorque);
-    rotuleL->EnableMotor(true);
-    rotuleL->SetMotorSpeed(-M_PI/2);
-    rotuleL->SetMaxMotorTorque(minTorque);
-  }
+//get-set
+float Moustik::getAbs(){
+  return ptrHead->getPos().x;
 }
-Coord Moustik::getPos(){
-  return ptrHead->getPos();
+string Moustik::getType(){
+  return controlType;
 }
-bool Moustik::undertaker(int nFrame){
-  //permet de tester si le moustik et mort
-  float limit=2e-2;
-  if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
-    ptrHead->getBody()->SetActive(false);
-    ptrLegL->getBody()->SetActive(false);
-    ptrLegR->getBody()->SetActive(false);
-    dead=true;
-    if (!seqWritten){
-      writeGenome(ptrHead->getPos().x, "../sequences/"+controlType+".txt", false);
-    }
-  }
+bool Moustik::isDead(){
   return dead;
 }
-void Moustik::updateFitness(){
-  genome->setFitness(max(ptrHead->getPos().x, genome->getFitness()));
-}
+//jeu
 void Moustik::reset(b2World* ptrWorld){
   seqWritten=false;
   delete ptrHead;
@@ -245,9 +214,9 @@ void Moustik::reset(b2World* ptrWorld){
   dead = false;
   //definition of bodies
   Coord pos(0, 2);
-  ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0, 1.0); //tête dynamique de 0.5x0.5
-  ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-0.75), 0.05, 0.5, 0, 1.0); //jambe dynamique de 0.1x1
-  ptrLegR = new Forme(ptrWorld, pos+Coord(0.25,-0.75), 0.05, 0.5, 0, 1.5); //jambe dynamique de 0.1x1
+  ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
+  ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-1.05), 0.05, 0.8, 0); //jambe dynamique de 0.1x1
+  ptrLegR = new Forme(ptrWorld, pos+Coord(0.25,-1.05), 0.05, 0.8, 0); //jambe dynamique de 0.1x1
   //définition de la rotuleL et rotuleR
   b2RevoluteJointDef defRotuleL;
   b2RevoluteJointDef defRotuleR;
@@ -269,11 +238,51 @@ void Moustik::reset(b2World* ptrWorld){
   rotuleL = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defRotuleL );
   rotuleR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defRotuleR );
 }
-float Moustik::getAbs(){
-  return ptrHead->getPos().x;
+void Moustik::commande(b2World* ptrWorld, int nFrame){
+  genome->addAbsoluteDate(nFrame);
+  com=1+com%2;
+  float upTorque=5;
+  float downTorque=7;
+  if (dead) { //on tue tout.
+    rotuleL->EnableMotor(false);
+    rotuleR->EnableMotor(false);
+  }	else if (com==1){
+    //la jambe L monte
+    rotuleL->EnableMotor(true);
+    rotuleL->SetMotorSpeed(M_PI/4); //1/4 de tour par seconde
+    rotuleL->SetMaxMotorTorque(upTorque);
+    rotuleR->EnableMotor(true);
+    rotuleR->SetMotorSpeed(-M_PI/7);
+    rotuleR->SetMaxMotorTorque(downTorque);
+  } else if (com==2){
+    //la jambe R monte
+    rotuleR->EnableMotor(true);
+    rotuleR->SetMotorSpeed(M_PI/4);
+    rotuleR->SetMaxMotorTorque(upTorque);
+    rotuleL->EnableMotor(true);
+    rotuleL->SetMotorSpeed(-M_PI/7);
+    rotuleL->SetMaxMotorTorque(downTorque);
+  }
 }
-string Moustik::getType(){
-  return controlType;
+Coord Moustik::getPos(){
+  return ptrHead->getPos();
+}
+bool Moustik::undertaker(int nFrame){
+  //permet de tester si le moustik et mort
+  float limit=2e-2;
+  if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
+    ptrHead->getBody()->SetActive(false);
+    ptrLegL->getBody()->SetActive(false);
+    ptrLegR->getBody()->SetActive(false);
+    dead=true;
+    if (!seqWritten){
+      writeGenome(ptrHead->getPos().x, "../sequences/"+controlType+".txt", false);
+    }
+  }
+  return dead;
+}
+void Moustik::updateFitness(){
+  genome->setFitness(max(ptrHead->getPos().x, genome->getFitness()));
 }
 GLvoid Moustik::drawOpenGL(){
   if (dead) { //si mort, il devient rouge
@@ -311,6 +320,8 @@ void Moustik::writeGenome(int fitness, string filename, bool erase){
   seqWritten=true;
 }
 
+//MOUSTIKIA
+//constructeurs
 MoustikIA::MoustikIA(b2World* ptrWorld, Coord pos, Genome* genome, string id) : Moustik(ptrWorld, pos){
   this->id=id;
   controlType="IA";
@@ -321,6 +332,7 @@ MoustikIA::MoustikIA(b2World* ptrWorld, Coord pos, vector<int> seq, string id) :
   controlType="IA";
   genome = new Genome(seq, -1);
 }
+//get-set
 Genome* MoustikIA::getGenome(){
   return genome;
 }
@@ -333,7 +345,8 @@ void MoustikIA::setID(string newID){
 string MoustikIA::getID(){
   return id;
 }
-void MoustikIA::isActive(bool activate){
+//jeu
+void MoustikIA::activation(bool activate){
   ptrHead->getBody()->SetActive(activate);
   ptrLegL->getBody()->SetActive(activate);
   ptrLegR->getBody()->SetActive(activate);

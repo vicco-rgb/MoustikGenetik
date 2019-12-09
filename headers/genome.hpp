@@ -51,7 +51,7 @@ public:
   Population mutateGroup(Population);
   Population getChildren(int);
 
-  void playLive(int);
+  MoustikIA* playLive(int);
   void playOff();
 
   void writeGenomes();
