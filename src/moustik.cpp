@@ -241,8 +241,8 @@ void Moustik::reset(b2World* ptrWorld){
 void Moustik::commande(b2World* ptrWorld, int nFrame){
   genome->addAbsoluteDate(nFrame);
   com=1+com%2;
-  float upTorque=5;
-  float downTorque=7;
+  float upTorque=3;
+  float downTorque=3;
   if (dead) { //on tue tout.
     rotuleL->EnableMotor(false);
     rotuleR->EnableMotor(false);

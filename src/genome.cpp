@@ -241,6 +241,7 @@ MoustikIA* Population::playLive(int nFrame){
   for (int i=0; i<moustiks.size(); i++){
     if (!moustiks[i]->isDead()){
       //on trouve le premier vivant
+      cout<<i<<endl;
       moustiks[i]->activation(true);
       return moustiks[i];
     } else {

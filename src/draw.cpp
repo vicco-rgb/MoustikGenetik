@@ -75,8 +75,6 @@ GLvoid affichage(){
 	if (channel) { //vrai monde
 		cousin->drawOpenGL();
 		ground->drawOpenGL();
-		glLoadIdentity();
-		gluOrtho2D(abscisse-2.0, abscisse+4.0, -1.0, 3.0);
 	} else {
 		groundIAs->drawOpenGL();
 		cousinIA->drawOpenGL();
@@ -85,6 +83,8 @@ GLvoid affichage(){
 	if (grid){ //affichage de la grille
 		drawQuadrillage(floor(abscisse)-2,floor(abscisse)+5,-2,3);
 	}
+	glLoadIdentity();
+	gluOrtho2D(abscisse-2.0, abscisse+4.0, -1.0, 3.0);
 	glutSwapBuffers();
 }
 GLvoid update(int fps){
@@ -102,6 +102,7 @@ GLvoid update(int fps){
 		nFrameIAs++;
 		ptrWorldIAs->Step((float32)1/fps, (int32)8, (int32)3);
 		cousinIA=HomoSapiens->playLive(nFrameIAs);
+		cousinIA->play(ptrWorldIAs, nFrameIAs);
 		cousinIA->undertaker(nFrameIAs);
 		cousinIA->updateFitness();
 		abscisse=cousinIA->getAbs();

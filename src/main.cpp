@@ -78,9 +78,6 @@ int main(int argc, char** argv){
 
 	Init(); 	//définition des variables.
 
-	HomoSapiens->playOff();
-	HomoSapiens->writeGenomes();
-
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);	// Choix du mode d'affichage (ici RVB)
 	glutInitWindowPosition(0,0); // Position initiale de la fenetre GLUT
