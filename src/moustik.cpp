@@ -269,7 +269,7 @@ Coord Moustik::getPos(){
 }
 bool Moustik::undertaker(int nFrame){
   //permet de tester si le moustik et mort
-  float limit=2e-2;
+  float limit=5e-2;
   if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
     ptrHead->getBody()->SetActive(false);
     ptrLegL->getBody()->SetActive(false);
@@ -360,7 +360,7 @@ void MoustikIA::play(b2World* ptrWorld, int nFrame){
 }
 bool MoustikIA::undertaker(int nFrame){
   //permet de tester si le moustik et mort
-  float limit=2e-2;
+  float limit=5e-2;
   if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
     dead=true;
     ptrHead->getBody()->SetActive(false);

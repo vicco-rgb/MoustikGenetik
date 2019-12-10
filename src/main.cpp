@@ -59,14 +59,11 @@ void Init(){
 	HomoSapiens = new Population();
 	for (int i=0; i<50; i++){
 		Genome* genomeIA = new Genome(40);
-		cout<<Genome(40)<<endl;
 		MoustikIA* cousinIA = new MoustikIA(ptrWorldIAs, Coord(0.0,3.0), genomeIA, to_string(i));
 		cousinIA->activation(false); //on rend le moustik inactif
 		HomoSapiens->addMoustik(cousinIA);
 	}
 	Genome* affgen=HomoSapiens->getMoustiks()[0]->getGenome();
-	cout<<*affgen<<endl;
-	cout<<"Init1"<<endl;
 
 }
 
@@ -79,8 +76,6 @@ int main(int argc, char** argv){
 	B2_NOT_USED(argv);
 	srand(time(0));
 
-	cout<<Genome(40)<<endl;
-	cout<<"non"<<endl;
 	Init(); 	//définition des variables.
 
 	HomoSapiens->playOff();

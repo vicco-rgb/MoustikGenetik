@@ -44,7 +44,7 @@ Genome::Genome(vector<int> seq, float fitness) {
 }
 Genome::Genome(int tailleSeq) {
   //cette fonction fabrique un génome[tailleSeq] aléatoirement
-  for (int i=0; i++; i<tailleSeq){
+  for (int i=0; i<tailleSeq; i++){
     //nombres aléatoires entre 1 et 20;
     seq.push_back(1+rand()%20);
   }
@@ -257,6 +257,7 @@ void Population::playOff(){
     while (moustiks[i]->undertaker(frame)){
       //tant que le moustiks est vivant:
       frame++;
+      moustiks[i]->play(ptrWorldIAs, frame);
       ptrWorldIAs->Step((float32)1/fps, (int32)8, (int32)3);
       moustiks[i]->updateFitness();
     }
