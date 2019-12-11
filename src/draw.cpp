@@ -88,21 +88,14 @@ GLvoid update(int fps){
 	glutTimerFunc(dt, update, fps);
 	//le jeu se met en pause lorsque l'on change de channel
 	if (channel){
-<<<<<<< HEAD
 		//on s'interesse au monde utilisateur
-=======
-		//on s'interesse au monde IA ou au monde jeu?
->>>>>>> e9bcecaa55a8efbe14dc0d5d8aee48c8bbf6c431
 		cousin->upAge();
 		cousin->getWorld()->Step((float32)1/fps, (int32)8, (int32)3);
 		cousin->undertaker(); //est-ce que il est mort ?
 		cousin->updateFitness();
 		abscisse=cousin->getAbs();
 	} else {
-<<<<<<< HEAD
 		//on s'intéresse au monde jeu
-=======
->>>>>>> e9bcecaa55a8efbe14dc0d5d8aee48c8bbf6c431
 		cousinIA->upAge();
 		cousinIA->getWorld()->Step((float32)1/fps, (int32)8, (int32)3);
 		cousinIA=HomoSapiens->playLive();
