@@ -73,16 +73,20 @@ protected:
 	string controlType;
 	Genome* genome;
 	bool seqWritten;
+  int age;
 public:
   //constructeurs
 	Moustik(b2World*, Coord);
 	~Moustik();
-	void commande(b2World*, int);
+	void commande();
 	Coord getPos();
   bool isDead();
-	virtual bool undertaker(int);
+  int getAge();
+  void upAge();
+  b2World* getWorld();
+	virtual bool undertaker();
 	void updateFitness();
-	void reset(b2World*);
+	void reset();
 	float getAbs();
 	string getType();
 	GLvoid drawOpenGL();
@@ -100,6 +104,6 @@ public:
   void setID(string);
   string getID();
   void activation(bool);
-	void play(b2World*, int);
-	virtual bool undertaker(int);
+	void play();
+	virtual bool undertaker();
 };
