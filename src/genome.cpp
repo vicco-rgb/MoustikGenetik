@@ -7,10 +7,8 @@ VARIABLES GLOBALES #########################################################
 
 extern int fps;
 //IAWORLD
-extern b2World* ptrWorldIAs;
 extern Forme* groundIAs;
 extern Population* HomoSapiens; //les premiers génomes
-extern int nFrameIAs;
 
 //FONCTIONS ##################################################################
 //SURCHARGES
@@ -75,12 +73,12 @@ float Genome::getFitness(){
 void Genome::setFitness(float fit){
   fitness=fit;
 }
-void Genome::addAbsoluteDate(int nFrame){
+void Genome::addAbsoluteDate(int date){
   int previous=0;
   if (seq.size()>0){
     previous=seq.back();
   }
-  seq.push_back(nFrame-previous);
+  seq.push_back(date-previous);
 }
 //mutation
 Genome* Genome::crossSplit(Genome* genome){
@@ -237,7 +235,7 @@ while (newGeneration.getMoustiks().size()<moustiks.size()){
 newGeneration = mutateGroup(newGeneration); // on les fait muter
 return newGeneration;
 }
-MoustikIA* Population::playLive(int nFrame){
+MoustikIA* Population::playLive(){
   for (int i=0; i<moustiks.size(); i++){
     if (!moustiks[i]->isDead()){
       //on trouve le premier vivant
@@ -254,12 +252,11 @@ MoustikIA* Population::playLive(int nFrame){
 void Population::playOff(){
   for (int i=0;i<moustiks.size(); i++){
     moustiks[i]->activation(true);
-    int frame=0;
-    while (moustiks[i]->undertaker(frame)){
+    while (moustiks[i]->undertaker()){
       //tant que le moustiks est vivant:
-      frame++;
-      moustiks[i]->play(ptrWorldIAs, frame);
-      ptrWorldIAs->Step((float32)1/fps, (int32)8, (int32)3);
+      moustiks[i]->upAge();
+      moustiks[i]->play();
+      moustiks[i]->getWorld()->Step((float32)1/fps, (int32)8, (int32)3);
       moustiks[i]->updateFitness();
     }
     moustiks[i]->activation(false);

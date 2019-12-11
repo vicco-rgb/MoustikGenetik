@@ -1,13 +1,14 @@
 # Compte Rendu
 _Chloé Leric_ et _Victor Duvivier_.
 
-## Introduction
-Notre projet consiste en l'application d'un ou de plusieurs algorithmes génétiques sur un mini-jeu.
+Notre projet consiste en l'application d'un ou de plusieurs algorithmes génétiques sur un mini-jeu. Nous nous sommes inspirés du mini-jeu [Daddy Long Legs](https://play.google.com/store/apps/details?id=com.setsnail.daddylonglegs&hl=fr)
 
-[//]: # (<iframe width="560" height="315" src="https://www.youtube.com/embed/noNl_cvYLu8" frameborder="0" allow="accelerometer autoplay encrypted-media gyroscope picture-in-picture" allowfullscreen></iframe>)
+<img src="imgs/daddy.jpg" height=200>
 
-## Explication générale du code
-Le but de notre algorithme est de générer
+## Sujet
+
+Le but de notre algorithme est de générer un ensemble de `moustiks` et de les faire jouer dans un environnement physique 2D. Un algorithme génétique est ensuite appliqué pour améliorer les performances de déplacement des moustiks. Le critère utilisé pour départager les individus est la distance (positive) maximale parcourue par l'utilisateur.
+
 ### Diagramme de classe
 Les différentes classes existant dans notre code sont:
 + `Forme` cette classe correspond à un rectangle physique. Cette classe contient un attribut `b2Body* body` issu de la librairie moteur physique `Box2D`. La classe forme permet d'automatiser la création de boîtes physiques et facilite l'écriture des fonctions d'affichage de ces formes sous `OpenGL`.
@@ -20,15 +21,19 @@ Les différentes classes existant dans notre code sont:
 
 ```mermaid
 classDiagram
+Population--MoustikIA
+MoustikIA--Genome
+Moustik--|>MoustikIA
+Moustik--Coord
+Moustik--Forme
+
 class Coord {
   - float x
   - float y
   - Coord()
   - Coord(float, float)
 }
-```
-```mermaid
-classDiagram
+
 class Forme {
   # b2Body* body
   # float width
@@ -53,10 +58,7 @@ class Forme {
   - GLvoid drawOpenGL()
   - GLvoid drawOpenGL(float, float, float)
 }
-```
-```mermaid
-classDiagram
-Moustik-->MoustikIA
+
 class Moustik {
   # Forme* ptrHead
   # Forme* ptrLegL
@@ -65,35 +67,40 @@ class Moustik {
   # b2RevoluteJoint* rotuleR
   # int com
   # bool dead
-  # float score
   # float angleMax
   # string controlType
-  # vector[int] sequence
+  # Genome* genome
   # bool seqWritten
   - Moustik(b2World*, Coord)
   - ~Moustik()
   - void commande(b2World*, int)
   - Coord getPos()
-  - virtual void undertaker(int)
-  - void updateScore()
+  - bool isDead()
+  - int getAge()
+  - void upAge()
+  - virtual bool undertaker(int)
+  - void updateFitness()
   - void reset(b2World*)
   - float getAbs()
   - string getType()
   - GLvoid drawOpenGL()
   - void writeSeqDown(int, string, bool)
 }
+
 class MoustikIA {
   # Genome genome
   # int id
   - MoustikIA(b2World*, Coord, Genome, int)
   - MoustikIA(b2World*, Coord, vector[int], int)
+  - Genome* getGenome();
+  - void setGenome(Genome*)
+  - void setID(string)
+  - string getID()
+  - void activation(bool)
   - void play(b2World*, int)
-  - virtual void undertaker(int)
-  - vector[int] getSeq()
+  - virtual bool undertaker(int)
 }
-```
-```mermaid
-classDiagram
+
 class Genome {
   # int fitness
   # vector[int] seq
@@ -104,33 +111,36 @@ class Genome {
   - ~Genome()
   - vector[int] getRelativeSeq()
   - vector[int] getAbsoluteSeq()
-  - int getFitness()
+  - float getFitness()
+  - void setFitness(float)
+  - void addAbsoluteDate(int);
   - Genome* crossSplit(Genome*)
   - Genome* crossAvg(Genome*)
   - Genome* mutation()
   - bool betterThan(Genome*)
 }
-```
-```mermaid
-classDiagram
+
 class Population {
   # vector[MoustikIA*] moustiks
   # int generation
   - Population()
-  - Population(vector[Genome*], int)
+  - Population(vector<MoustikIA*>, int)
   - Population(Population*)
   - ~Population()
-  - vector[Genome*] getGenomes()
-  - void addGenome(Genome*)
+  - vector<MoustikIA*> getMoustiks()
+  - void addMoustik(MoustikIA*)
   - int getGeneration()
+  - void setGeneration(int)
   - Population bests(int)
   - Population reproduction(Population)
   - Population mutateGroup(Population)
   - Population getChildren(int)
-  - run()
+  - void playLive(int)
+  - void playOff()
+  - void writeGenomes()
+  - vector<Genome*> readGenomes(string)
 }
 ```
-faire une méthode pour population qui lance la simulation des moustiks un par un, qui détermine leur fitnesse à chacun et qui ensuite écrive dans des dossiers (génération/id xxx/yyy).
 
 writeGenomes() de Population écrit un fichier "generationXXX.txt" contenant des séquences avec des retours à la ligne.
 

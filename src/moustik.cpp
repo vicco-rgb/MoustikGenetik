@@ -1,10 +1,6 @@
 #include "moustik.hpp"
 #include "genome.hpp"
 
-//VARIABLES GLOBALES############################################################
-
-extern int nFrame;
-extern int nFrameIAs;
 
 //STRUCTURES ###################################################################
 
@@ -161,9 +157,10 @@ GLvoid Forme::drawOpenGL(float r, float g, float b){
 //MOUSTIK
 //constructeurs
 Moustik::Moustik(b2World* ptrWorld, Coord pos){
+  age=0;
   com = 0;
   dead=false;
-  angleMax = 3*M_PI/8;
+  angleMax = M_PI/2;
   controlType="human";
   seqWritten=false;
   genome= new Genome();
@@ -203,8 +200,18 @@ string Moustik::getType(){
 bool Moustik::isDead(){
   return dead;
 }
+int Moustik::getAge(){
+  return age;
+}
+void Moustik::upAge(){
+  cout<<age<<endl;
+  age=age+1;
+}
+b2World* Moustik::getWorld(){
+  return ptrHead->getBody()->GetWorld();
+}
 //jeu
-void Moustik::reset(b2World* ptrWorld){
+void Moustik::reset(){
   seqWritten=false;
   delete ptrHead;
   delete ptrLegL;
@@ -214,9 +221,9 @@ void Moustik::reset(b2World* ptrWorld){
   dead = false;
   //definition of bodies
   Coord pos(0, 2);
-  ptrHead = new Forme(ptrWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
-  ptrLegL = new Forme(ptrWorld, pos+Coord(-0.25,-1.05), 0.05, 0.8, 0); //jambe dynamique de 0.1x1
-  ptrLegR = new Forme(ptrWorld, pos+Coord(0.25,-1.05), 0.05, 0.8, 0); //jambe dynamique de 0.1x1
+  ptrHead = new Forme(getWorld(), pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
+  ptrLegL = new Forme(getWorld(), pos+Coord(-0.25,-1.05), 0.05, 0.8, 0); //jambe dynamique de 0.1x1
+  ptrLegR = new Forme(getWorld(), pos+Coord(0.25,-1.05), 0.05, 0.8, 0); //jambe dynamique de 0.1x1
   //définition de la rotuleL et rotuleR
   b2RevoluteJointDef defRotuleL;
   b2RevoluteJointDef defRotuleR;
@@ -235,11 +242,11 @@ void Moustik::reset(b2World* ptrWorld){
   defRotuleR.lowerAngle = -angleMax;
   defRotuleR.upperAngle = angleMax;
   //créer le joint
-  rotuleL = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defRotuleL );
-  rotuleR = (b2RevoluteJoint*) ptrWorld->CreateJoint( &defRotuleR );
+  rotuleL = (b2RevoluteJoint*) getWorld()->CreateJoint( &defRotuleL );
+  rotuleR = (b2RevoluteJoint*) getWorld()->CreateJoint( &defRotuleR );
 }
-void Moustik::commande(b2World* ptrWorld, int nFrame){
-  genome->addAbsoluteDate(nFrame);
+void Moustik::commande(){
+  genome->addAbsoluteDate(age);
   com=1+com%2;
   float upTorque=3;
   float downTorque=3;
@@ -267,7 +274,7 @@ void Moustik::commande(b2World* ptrWorld, int nFrame){
 Coord Moustik::getPos(){
   return ptrHead->getPos();
 }
-bool Moustik::undertaker(int nFrame){
+bool Moustik::undertaker(){
   //permet de tester si le moustik et mort
   float limit=5e-2;
   if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
@@ -351,14 +358,14 @@ void MoustikIA::activation(bool activate){
   ptrLegL->getBody()->SetActive(activate);
   ptrLegR->getBody()->SetActive(activate);
 }
-void MoustikIA::play(b2World* ptrWorld, int nFrame){
+void MoustikIA::play(){
   //fonction appelée a toutes les frames
   vector<int> sequence = genome->getAbsoluteSeq();
-  if (count(sequence.begin(), sequence.end(), nFrame)==1){
-    commande(ptrWorld, nFrame);
+  if (count(sequence.begin(), sequence.end(), age)==1){
+    commande();
   }
 }
-bool MoustikIA::undertaker(int nFrame){
+bool MoustikIA::undertaker(){
   //permet de tester si le moustik et mort
   float limit=5e-2;
   if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
@@ -366,11 +373,6 @@ bool MoustikIA::undertaker(int nFrame){
     ptrHead->getBody()->SetActive(false);
     ptrLegL->getBody()->SetActive(false);
     ptrLegR->getBody()->SetActive(false);
-    //on écrit la séquence de jeu dans un fichier texte.
-    if (!seqWritten){
-      string filename="../sequences/"+controlType+"-"+id+".txt";
-      writeGenome(genome->getFitness(), filename, true);
-    }
   }
   return dead;
 }

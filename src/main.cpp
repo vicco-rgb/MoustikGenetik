@@ -31,15 +31,11 @@ bool channel=true; //par défaut, mode de jeu
 bool grid=false;
 int fps=60;
 //REAL WORLD
-b2World* ptrWorld;
 Moustik* cousin;
 Forme* ground;
-int nFrame;
 //IAWORLD
-b2World* ptrWorldIAs;
 Forme* groundIAs;
 Population* HomoSapiens; //les premiers génomes
-int nFrameIAs;
 
 /*
 		INIT #######################################################################
@@ -48,15 +44,16 @@ int nFrameIAs;
 void Init(){
 
 	//HUMAN WORLD
-	ptrWorld = new b2World(b2Vec2(0.0f,-9.81f));
+	b2World* ptrWorld = new b2World(b2Vec2(0.0f,-9.81f));
 	cousin = new Moustik(ptrWorld, Coord(0.0,3.0));
 	ground = new Forme(ptrWorld, Coord(0.0,-1.0), 10.0, 1.0, 1);
-	nFrame=0;
 
 	//IA WORLD
-	ptrWorldIAs = new b2World(b2Vec2(0.0f,-9.81f));
+	b2World* ptrWorldIAs = new b2World(b2Vec2(0.0f,-9.81f));
 	groundIAs = new Forme(ptrWorldIAs, Coord(0.0,-1.0), 100.0, 1.0, 1); //! peut-être trop court !
 	HomoSapiens = new Population();
+	//ALEATOIRE
+	cout<<"bonjour"<<endl;
 	for (int i=0; i<50; i++){
 		Genome* genomeIA = new Genome(40);
 		MoustikIA* cousinIA = new MoustikIA(ptrWorldIAs, Coord(0.0,3.0), genomeIA, to_string(i));
@@ -64,6 +61,14 @@ void Init(){
 		HomoSapiens->addMoustik(cousinIA);
 	}
 	Genome* affgen=HomoSapiens->getMoustiks()[0]->getGenome();
+
+	//READFILE
+	// vector<Genome*> genomes=HomoSapiens->readGenomes("../sequences/human.txt");
+	// for (int i=0; i<genomes.size(); i++){
+	// 	MoustikIA* cousinIA = new MoustikIA(ptrWorldIAs, Coord(0.0,3.0), genomes[i], to_string(i));
+	// 	cousinIA->activation(false); //on rend le moustik inactif
+	// 	HomoSapiens->addMoustik(cousinIA);
+	// }
 
 }
 

@@ -10,16 +10,12 @@ float abscisse=0;
 extern bool channel; //par défaut, mode de jeu
 extern bool grid;
 //REAL WORLD
-extern b2World* ptrWorld;
-extern Moustik* cousin;
+extern Moustik* cousin; //humain
 extern Forme* ground;
-extern int nFrame;
 //IAWORLD
-extern b2World* ptrWorldIAs;
 extern Forme* groundIAs;
 MoustikIA* cousinIA;
 extern Population* HomoSapiens; //les premiers génomes
-extern int nFrameIAs;
 
 /*
 FONCTIONS OPENGL ###############################################################
@@ -76,7 +72,7 @@ GLvoid affichage(){
 		cousin->drawOpenGL();
 		ground->drawOpenGL();
 	} else {
-		groundIAs->drawOpenGL();
+		groundIAs->drawOpenGL(0.7f,0.7f,1.0f);
 		cousinIA->drawOpenGL();
 		//faire passer les moustiks les uns après les autres.
 	}
@@ -92,18 +88,19 @@ GLvoid update(int fps){
 	glutTimerFunc(dt, update, fps);
 	//le jeu se met en pause lorsque l'on change de channel
 	if (channel){
-		//on s'interesse au monde IA ou au monde jeu?
-		nFrame++;
-		ptrWorld->Step((float32)1/fps, (int32)8, (int32)3);
-		cousin->undertaker(nFrame); //est-ce que il est mort ?
+		//on s'interesse au monde utilisateur
+		cousin->upAge();
+		cousin->getWorld()->Step((float32)1/fps, (int32)8, (int32)3);
+		cousin->undertaker(); //est-ce que il est mort ?
 		cousin->updateFitness();
 		abscisse=cousin->getAbs();
 	} else {
-		nFrameIAs++;
-		ptrWorldIAs->Step((float32)1/fps, (int32)8, (int32)3);
-		cousinIA=HomoSapiens->playLive(nFrameIAs);
-		cousinIA->play(ptrWorldIAs, nFrameIAs);
-		cousinIA->undertaker(nFrameIAs);
+		//on s'intéresse au monde jeu
+		cousinIA->upAge();
+		cousinIA->getWorld()->Step((float32)1/fps, (int32)8, (int32)3);
+		cousinIA=HomoSapiens->playLive();
+		cousinIA->play();
+		cousinIA->undertaker();
 		cousinIA->updateFitness();
 		abscisse=cousinIA->getAbs();
 	}
@@ -112,13 +109,13 @@ GLvoid update(int fps){
 GLvoid clavier(unsigned char touche, int x, int y) {
 	switch(touche) {
 		case 's':
-		cousin->commande(ptrWorld, nFrame);
+		cousin->commande();
 		break; //on ne peut commander qu'une seule jambe a la fois.
 		case 'g':
 		grid=!grid;
 		break;
 		case 'i':
-		cousin->reset(ptrWorld);
+		cousin->reset();
 		break;
 		case 'c':
 		channel=!channel;
