@@ -7,6 +7,7 @@ VARIABLES GLOBALES #############################################################
 */
 
 float abscisse=0;
+extern int fps;
 extern bool channel; //par défaut, mode de jeu
 extern bool grid;
 //REAL WORLD
@@ -96,13 +97,14 @@ GLvoid update(int fps){
 		abscisse=cousin->getAbs();
 	} else {
 		//on s'intéresse au monde jeu
+		cousinIA=HomoSapiens->playLive();
 		cousinIA->upAge();
 		cousinIA->getWorld()->Step((float32)1/fps, (int32)8, (int32)3);
-		cousinIA=HomoSapiens->playLive();
 		cousinIA->play();
 		cousinIA->undertaker();
 		cousinIA->updateFitness();
 		abscisse=cousinIA->getAbs();
+
 	}
 	glutPostRedisplay();
 }

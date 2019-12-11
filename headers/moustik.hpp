@@ -90,7 +90,7 @@ public:
 	float getAbs();
 	string getType();
 	GLvoid drawOpenGL();
-	void writeGenome(int, string, bool);
+	void writeGenome(bool);
 };
 
 class MoustikIA : public Moustik {

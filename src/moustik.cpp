@@ -204,8 +204,7 @@ int Moustik::getAge(){
   return age;
 }
 void Moustik::upAge(){
-  cout<<age<<endl;
-  age=age+1;
+  age++;
 }
 b2World* Moustik::getWorld(){
   return ptrHead->getBody()->GetWorld();
@@ -276,20 +275,20 @@ Coord Moustik::getPos(){
 }
 bool Moustik::undertaker(){
   //permet de tester si le moustik et mort
-  float limit=5e-2;
+  float limit=7e-2;
   if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
     ptrHead->getBody()->SetActive(false);
     ptrLegL->getBody()->SetActive(false);
     ptrLegR->getBody()->SetActive(false);
     dead=true;
     if (!seqWritten){
-      writeGenome(ptrHead->getPos().x, "../sequences/"+controlType+".txt", false);
+      writeGenome(false);
     }
   }
   return dead;
 }
 void Moustik::updateFitness(){
-  genome->setFitness(max(ptrHead->getPos().x, genome->getFitness()));
+  genome->setFitness( max(getAbs(), genome->getFitness()) );
 }
 GLvoid Moustik::drawOpenGL(){
   if (dead) { //si mort, il devient rouge
@@ -310,14 +309,15 @@ GLvoid Moustik::drawOpenGL(){
     }
   }
 }
-void Moustik::writeGenome(int fitness, string filename, bool erase){
+void Moustik::writeGenome(bool erase){
   //on écrit la séquence de jeu dans un fichier texte.
   vector<int> sequence=genome->getRelativeSeq();
+  float fitness = genome->getFitness();
   ofstream outfile;
   if (erase) { // on écrase le fichier actuel
-    outfile.open(filename, ios_base::ate);
+    outfile.open("../sequences/"+controlType+".txt", ios_base::ate);
   } else { //on ajoute au fichier actuel
-    outfile.open(filename, ios_base::app);
+    outfile.open("../sequences/"+controlType+".txt", ios_base::app);
   }
   for (int i=0;i<sequence.size();i++){
     outfile<<sequence[i]<<"\t";
@@ -367,7 +367,7 @@ void MoustikIA::play(){
 }
 bool MoustikIA::undertaker(){
   //permet de tester si le moustik et mort
-  float limit=5e-2;
+  float limit=7e-2;
   if (ptrHead->getHL().y<limit| ptrHead->getHR().y<limit| ptrHead->getTL().y<limit| ptrHead->getTR().y<limit){
     dead=true;
     ptrHead->getBody()->SetActive(false);

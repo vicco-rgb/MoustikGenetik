@@ -239,10 +239,18 @@ MoustikIA* Population::playLive(){
   for (int i=0; i<moustiks.size(); i++){
     if (!moustiks[i]->isDead()){
       //on trouve le premier vivant
-      cout<<i<<endl;
       moustiks[i]->activation(true);
+      if (moustiks[i]->getAge()==0){
+        cout<<"moustik numero"<<i<<"..."<<endl;
+      }
       return moustiks[i];
     } else {
+      if (i==moustiks.size()-1){
+        //si le dernier moustik est mort
+        writeGenomes();
+        cout<<"####### fin de la simulation #######"<<endl;
+        exit(0);
+      }
       //on désactive tous les précédents.
       moustiks[i]->activation(false);
     }
@@ -264,8 +272,9 @@ void Population::playOff(){
 }
 void Population::writeGenomes(){
   //on écrit la séquence de jeu dans un fichier texte.
+  cout<<"génomes en cours d'écriture..."<<endl;
   ofstream outfile;
-  outfile.open("../sequences/generation"+to_string(generation)+".txt");
+  outfile.open("../sequences/generation"+to_string(generation)+".txt", ios_base::ate);
   for (int i=0; i<moustiks.size(); i++){
     vector<int> sequence=moustiks[i]->getGenome()->getRelativeSeq();
     for (int j=0; j<sequence.size();j++){
@@ -274,6 +283,7 @@ void Population::writeGenomes(){
     outfile<<endl<<moustiks[i]->getGenome()->getFitness()<<endl;
   }
   outfile.close();
+  cout<<"génomes écrits ! cf ../sequences/generation"+to_string(generation)+".txt"<<endl;
 }
 vector<Genome*> Population::readGenomes(string filename){
   //filename doit être de la forme "generationXXX"

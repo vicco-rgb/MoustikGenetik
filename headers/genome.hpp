@@ -12,7 +12,7 @@ class MoustikIA;
 
 class Genome {
 private:
-  int fitness; //vaut -1 quand la séquence n'a pas encore été testée
+  float fitness; //vaut -1 quand la séquence n'a pas encore été testée
   vector<int> seq; //correspond à la durée pendant laquelle le moustik est resté sur la même jambe.
   float tauxMutation;
 public:

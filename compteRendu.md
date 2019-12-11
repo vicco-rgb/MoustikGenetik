@@ -3,13 +3,24 @@ _Chloé Leric_ et _Victor Duvivier_.
 
 Notre projet consiste en l'application d'un ou de plusieurs algorithmes génétiques sur un mini-jeu. Nous nous sommes inspirés du mini-jeu [Daddy Long Legs](https://play.google.com/store/apps/details?id=com.setsnail.daddylonglegs&hl=fr)
 
-<img src="imgs/daddy.jpg" height=200>
+<img src="imgs/daddy.jpg" height=300>
+
+
+
+
+
+
 
 ## Sujet
 
-Le but de notre algorithme est de générer un ensemble de `moustiks` et de les faire jouer dans un environnement physique 2D. Un algorithme génétique est ensuite appliqué pour améliorer les performances de déplacement des moustiks. Le critère utilisé pour départager les individus est la distance (positive) maximale parcourue par le `moustik`.
+Le but de notre algorithme est de générer un ensemble de `moustiks` et de les faire jouer dans un environnement physique 2D. Un algorithme génétique est ensuite appliqué pour améliorer les performances de déplacement des `moustik`. Le critère utilisé pour départager les individus est la distance (positive) maximale parcourue par le `moustik`.
 
-### Diagramme de classe
+## Décision du sujet
+
+
+
+## Description du code
+
 Les différentes classes existant dans notre code sont:
 + `Forme` cette classe correspond à un rectangle physique. Elle permet d'automatiser la création de boîtes physiques et facilite l'écriture des fonctions d'affichage de ces formes sous `OpenGL`.
 
@@ -54,8 +65,9 @@ Les différentes classes existant dans notre code sont:
   + Cette classe contient donc une liste `vector<MoustikIA*>` .
   + Ainsi que l'entier `generation` correspondant à la génération de cette population.
 
+### Diagramme de classe
+
 `+` public
-`-` private
 `#` protected
 
 ```mermaid
@@ -180,9 +192,8 @@ class Population {
 }
 ```
 
-writeGenomes() de Population écrit un fichier "generationXXX.txt" contenant des séquences avec des retours à la ligne.
-
 ## Bibliographie
+
 pdf
 : [NatureOfCode](https://natureofcode.com/book/chapter-5-physics-libraries/)
 
