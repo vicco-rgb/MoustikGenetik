@@ -235,7 +235,6 @@ Population* Population::getChildren(int n){
     //pour ne pas faire planter l'algorithme
     n=moustiks.size();
   }
-
   Population* bestPop = bests(n); //les trouve les n meilleurs parents
   Population* newGeneration = reproduction(bestPop); //on récupère les n enfants (incrémente generation)
   while (newGeneration->getMoustiks().size()<moustiks.size()){
@@ -247,12 +246,12 @@ Population* Population::getChildren(int n){
 }
 MoustikIA* Population::playLive(){
   for (int i=0; i<moustiks.size(); i++){
+    if (moustiks[i]->getAge()==0){
+      cout<<"GENERATION "<<generation<<" MOUSTIK "<<i<<"..."<<endl;
+    }
     if (!moustiks[i]->isDead()){
       //on trouve le premier vivant
       moustiks[i]->activation(true);
-      if (moustiks[i]->getAge()==0){
-        cout<<"GENERATION "<<generation<<" MOUSTIK "<<i<<"..."<<endl;
-      }
       return moustiks[i];
     } else {
       //on désactive tous les précédents.

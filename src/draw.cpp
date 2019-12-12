@@ -107,9 +107,9 @@ GLvoid update(int fps){
         cout<<"####### end simulation of generation "+to_string(HomoSapiens->getGeneration())+" #######"<<endl;
 				//on passe à la génération suivante ou on arrête la simulation?
         cout<<"0-quit \t 1-generation suivante : ";
-        int choix;
-        cin >> choix;
-        if (choix==1 | true){
+        int choix=1;
+        //cin >> choix;
+        if (choix==1){
           //on prend la moitiée des meilleurs moustiks.
 					cout<<"upGeneration"<<endl;
           HomoSapiens = HomoSapiens->getChildren(HomoSapiens->getMoustiks().size()/2);

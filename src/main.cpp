@@ -53,7 +53,7 @@ void Init(){
 	groundIAs = new Forme(ptrWorldIAs, Coord(0.0,-1.0), 100.0, 1.0, 1); //! peut-être trop court !
 	HomoSapiens = new Population();
 	// //ALEATOIRE
-	for (int i=0; i<15; i++){ // nombre d'individu dans la population.
+	for (int i=0; i<4; i++){ // nombre d'individu dans la population.
 		Genome* genomeIA = new Genome(40);
 		MoustikIA* cousinIA = new MoustikIA(ptrWorldIAs, Coord(0.0,3.0), genomeIA, to_string(i));
 		cousinIA->activation(false); //on rend le moustik inactif
