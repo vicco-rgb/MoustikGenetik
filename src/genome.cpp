@@ -99,7 +99,7 @@ Genome* Genome::crossSplit(Genome* genome){
 }
 Genome* Genome::crossAvg(Genome* genome){
   //cette fonction produit un enfant génome à partir de deux parents en faisant la moyenne de chaque paire de dates. Cette moyenne est pondérée par le ratio des fitness.
-  Genome *fils = new Genome();
+  vector<int> seqout;
   vector<int> bigSeq;
   vector<int> litSeq;
   float ratio; // fitnessBigSeq/fitnessLitSeq
@@ -114,13 +114,13 @@ Genome* Genome::crossAvg(Genome* genome){
   }
   for (int i=0; i<litSeq.size(); i++){
     //moyenne pondérée des dates par le ratio des fitness
-    fils->getRelativeSeq().push_back(bigSeq[i]*ratio + (1-ratio)*litSeq[i]);
+    seqout.push_back(bigSeq[i]*ratio + (1-ratio)*litSeq[i]);
   }
   for (int j=litSeq.size(); j<bigSeq.size();j++){
     //on complète sans moyenner avec la séquence qui est plus grande
-    fils->getRelativeSeq().push_back(seq[j]);
+    seqout.push_back(seq[j]);
   }
-  return fils;
+  return new Genome(seqout, -1);
 }
 Genome* Genome::mutation(){
   vector<int> mutseq=seq;
@@ -205,6 +205,7 @@ Population* Population::bests(int n){
 Population* Population::reproduction(Population pop){
   int size=pop.getMoustiks().size();
   vector<MoustikIA*> children = pop.getMoustiks();
+  b2World* ptrWorldIAs = moustiks[0]->getWorld(); //pour initialisation nouveaux moustiks
   for (int i=0;i<size;i++){
     //on cherche un papa et une maman pour l'enfant.
     int dad=rand()%size;
@@ -213,7 +214,9 @@ Population* Population::reproduction(Population pop){
       //first et second doivent être différents.
       mom=rand()%size;
     }
-    children[i]->setGenome(pop.getMoustiks()[dad]->getGenome()->crossAvg(pop.getMoustiks()[mom]->getGenome()));
+    Genome* genomei = pop.getMoustiks()[dad]->getGenome()->crossAvg(pop.getMoustiks()[mom]->getGenome());
+    children[i] = new MoustikIA(ptrWorldIAs, Coord(0.0,3.0), genomei, to_string(i));
+    children[i]->activation(false);
   }
   return new Population(children, pop.getGeneration()+1);
 }
@@ -232,6 +235,7 @@ Population* Population::getChildren(int n){
     //pour ne pas faire planter l'algorithme
     n=moustiks.size();
   }
+
   Population* bestPop = bests(n); //les trouve les n meilleurs parents
   Population* newGeneration = reproduction(bestPop); //on récupère les n enfants (incrémente generation)
   while (newGeneration->getMoustiks().size()<moustiks.size()){
@@ -247,16 +251,10 @@ MoustikIA* Population::playLive(){
       //on trouve le premier vivant
       moustiks[i]->activation(true);
       if (moustiks[i]->getAge()==0){
-        cout<<"moustik numero"<<i<<"..."<<endl;
+        cout<<"GENERATION "<<generation<<" MOUSTIK "<<i<<"..."<<endl;
       }
       return moustiks[i];
     } else {
-      if (i==moustiks.size()-1){
-        //si le dernier moustik est mort
-        writeGenomes();
-        cout<<"####### fin de la simulation #######"<<endl;
-        exit(0);
-      }
       //on désactive tous les précédents.
       moustiks[i]->activation(false);
     }
@@ -278,7 +276,6 @@ void Population::playOff(){
 }
 void Population::writeGenomes(){
   //on écrit la séquence de jeu dans un fichier texte.
-  cout<<"génomes en cours d'écriture..."<<endl;
   ofstream outfile;
   outfile.open("../sequences/generation"+to_string(generation)+".txt", ios_base::ate);
   for (int i=0; i<moustiks.size(); i++){
@@ -289,7 +286,7 @@ void Population::writeGenomes(){
     outfile<<endl<<moustiks[i]->getGenome()->getFitness()<<endl;
   }
   outfile.close();
-  cout<<"génomes écrits ! cf ../sequences/generation"+to_string(generation)+".txt"<<endl;
+  cout<<"genomes written to ../sequences/generation"<<generation<<".txt"<<endl;
 }
 vector<Genome*> Population::readGenomes(string filename){
   //filename doit être de la forme "generationXXX"

@@ -100,6 +100,25 @@ GLvoid update(int fps){
 		abscisse=cousin->getAbs();
 	} else {
 		//on s'intéresse au monde jeu
+		MoustikIA* lastMoustik = HomoSapiens->getMoustiks().back();
+		if (cousinIA == lastMoustik && lastMoustik->isDead()){
+        //si le dernier moustik est mort
+        HomoSapiens->writeGenomes();
+        cout<<"####### end simulation of generation "+to_string(HomoSapiens->getGeneration())+" #######"<<endl;
+				//on passe à la génération suivante ou on arrête la simulation?
+        cout<<"0-quit \t 1-generation suivante : ";
+        int choix;
+        cin >> choix;
+        if (choix==1 | true){
+          //on prend la moitiée des meilleurs moustiks.
+					cout<<"upGeneration"<<endl;
+          HomoSapiens = HomoSapiens->getChildren(HomoSapiens->getMoustiks().size()/2);
+        } else {
+          exit(0);
+        }
+
+		}
+
 		cousinIA=HomoSapiens->playLive();
 		cousinIA->upAge();
 		cousinIA->getWorld()->Step((float32)1/fps, (int32)8, (int32)3);
