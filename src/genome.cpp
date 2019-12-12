@@ -16,13 +16,14 @@ extern Population* HomoSapiens; //les premiers génomes
 ostream& operator<<(ostream& os, Population pop){
   for (int i=0;i<pop.getMoustiks().size();i++){
     //on affiche tous les génomes les uns après les autres.
-    cout<<"##### GENOME "<<i<<" #####"<<endl<<*(pop.getMoustiks()[i]->getGenome())<<endl;
+    Genome* genomei = pop.getMoustiks()[i]->getGenome();
+    cout<<"##### GENOME "<<i<<" #####"<<endl<<*genomei<<endl;
   }
   cout<<endl;
   return os;
 }
 ostream& operator<<(ostream& os, Genome genome){
-  cout<<genome.getAbsoluteSeq()<<endl;
+  cout<<genome.getAbsoluteSeq()<<endl<<"FITNESS : "<<genome.getFitness()<<endl;
   return os;
 }
 ostream& operator<<(ostream& os, vector<int> seq){
@@ -278,7 +279,7 @@ void Population::writeGenomes(){
   for (int i=0; i<moustiks.size(); i++){
     vector<int> sequence=moustiks[i]->getGenome()->getRelativeSeq();
     for (int j=0; j<sequence.size();j++){
-      outfile<<sequence[j]<<"\t";
+      outfile<<sequence[j]<<"_";
     }
     outfile<<endl<<moustiks[i]->getGenome()->getFitness()<<endl;
   }
@@ -289,25 +290,31 @@ vector<Genome*> Population::readGenomes(string filename){
   //filename doit être de la forme "generationXXX"
   //on prend le numéro de génération à partir du filename en convertissant string2int (stoi)
   vector<Genome*> out;
-  ifstream fichier(filename); //open file
-  if (!fichier) { //si tout vas bien (fichier ouver et non vide...)
+  ifstream fichier("../sequences/"+filename); //open file
+  if (!fichier) {
+    //si tout vas bien (fichier ouver et non vide...)
     cout << "Erreur à l'ouverture du fichier " << filename << endl;
+    cout << "Veuillez rentrer un chemin valide : ../sequences/"<<endl;
+    cin >> filename;
   }
-  while (fichier.eof()){
+  while (!fichier.eof()){
+    //tant que l'on n'arrive pas à la fin du fichier
     string seqtxt, fitxt;
     vector<int> sequence;
-    while(getline(fichier, seqtxt)){
-      //on écrit la séquence
-      string datestr;
-      while(seqtxt.find('\t')!=-1){
-        datestr=seqtxt.substr(seqtxt.find('\t')-1);
-        sequence.push_back(stoi(datestr));
-        seqtxt=seqtxt.substr(seqtxt.find('\t')+1, seqtxt.size());
-      }
-      getline(fichier, fitxt);
+    //on choppe la ligne correspondant aux séquences.
+    getline(fichier, seqtxt);
+    string datestr;
+    while(seqtxt.find('_')!=string::npos){
+      datestr=seqtxt.substr(0, seqtxt.find('_'));
+      sequence.push_back(stoi(datestr));
+      seqtxt=seqtxt.substr(seqtxt.find('_')+1, seqtxt.size());
     }
+    // + la dernière date n'étant pas suivie par "_"
+    getline(fichier, fitxt);
+
+    //on empile les génomes un par un
     out.push_back(new Genome(sequence, stof(fitxt)));
-    fichier.close();
   }
+  fichier.close();
   return out;
 }

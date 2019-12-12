@@ -361,7 +361,8 @@ void MoustikIA::activation(bool activate){
 void MoustikIA::play(){
   //fonction appelée a toutes les frames
   vector<int> sequence = genome->getAbsoluteSeq();
-  if (count(sequence.begin(), sequence.end(), age)==1){
+  if (count(sequence.begin(), sequence.end(), age%sequence.back())==1){
+    //la séquence se joue en boucle grâce au modulo.
     commande();
   }
 }
