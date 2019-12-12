@@ -100,6 +100,7 @@ GLvoid update(int fps){
 		abscisse=cousin->getAbs();
 	} else {
 		//on s'intéresse au monde jeu
+
 		MoustikIA* lastMoustik = HomoSapiens->getMoustiks().back();
 		if (cousinIA == lastMoustik && lastMoustik->isDead()){
         //si le dernier moustik est mort
@@ -116,7 +117,6 @@ GLvoid update(int fps){
         } else {
           exit(0);
         }
-
 		}
 
 		cousinIA=HomoSapiens->playLive();

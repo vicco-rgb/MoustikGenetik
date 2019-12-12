@@ -200,6 +200,7 @@ Population* Population::bests(int n){
   while (bestMoustiks.size()<n){
     bestMoustiks.push_back(moustiks[i]);
   }
+  cout<<"\t meilleur score : "<<bestMoustiks[0]->getGenome()->getFitness()<<endl;
   return new Population(bestMoustiks, generation);
 }
 Population* Population::reproduction(Population pop){

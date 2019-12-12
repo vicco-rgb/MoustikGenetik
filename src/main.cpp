@@ -53,7 +53,8 @@ void Init(){
 	groundIAs = new Forme(ptrWorldIAs, Coord(0.0,-1.0), 100.0, 1.0, 1); //! peut-être trop court !
 	HomoSapiens = new Population();
 	// //ALEATOIRE
-	for (int i=0; i<4; i++){ // nombre d'individu dans la population.
+	for (int i=0; i<100; i++){ // nombre d'individu dans la population.
+		//MINIMUM 4 moustiks générés.
 		Genome* genomeIA = new Genome(40);
 		MoustikIA* cousinIA = new MoustikIA(ptrWorldIAs, Coord(0.0,3.0), genomeIA, to_string(i));
 		cousinIA->activation(false); //on rend le moustik inactif
@@ -81,8 +82,7 @@ int main(int argc, char** argv){
 	srand(time(0));
 
 	Init(); 	//définition des variables.
-	while (HomoSapiens->getGeneration()<20){
-		//MINIMUM 4 moustiks générés.
+	while (HomoSapiens->getGeneration()<100){
 		HomoSapiens->playOff();
 		HomoSapiens->writeGenomes();
 		HomoSapiens=HomoSapiens->getChildren(HomoSapiens->getMoustiks().size()/2);
