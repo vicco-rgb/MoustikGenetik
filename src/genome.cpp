@@ -263,11 +263,11 @@ MoustikIA* Population::playLive(){
 void Population::playOff(){
   for (int i=0;i<moustiks.size(); i++){
     moustiks[i]->activation(true);
-    while (moustiks[i]->undertaker()){
+    while (!moustiks[i]->undertaker()){
       //tant que le moustiks est vivant:
       moustiks[i]->upAge();
-      moustiks[i]->play();
       moustiks[i]->getWorld()->Step((float32)1/fps, (int32)8, (int32)3);
+      moustiks[i]->play(); //joue 1 frame
       moustiks[i]->updateFitness();
     }
     moustiks[i]->activation(false);

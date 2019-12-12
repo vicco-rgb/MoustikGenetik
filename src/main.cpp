@@ -81,10 +81,12 @@ int main(int argc, char** argv){
 	srand(time(0));
 
 	Init(); 	//définition des variables.
-	// HomoSapiens->playOff();
-	// Population* HomoSapiens2 = HomoSapiens->getChildren(5);
-	// HomoSapiens->writeGenomes();
-	// HomoSapiens2->writeGenomes();
+	while (HomoSapiens->getGeneration()<20){
+		//MINIMUM 4 moustiks générés.
+		HomoSapiens->playOff();
+		HomoSapiens->writeGenomes();
+		HomoSapiens=HomoSapiens->getChildren(HomoSapiens->getMoustiks().size()/2);
+	}
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);	// Choix du mode d'affichage (ici RVB)
