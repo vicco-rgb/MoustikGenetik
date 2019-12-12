@@ -16,7 +16,9 @@ Notre projet consiste en l'application d'un ou de plusieurs algorithmes généti
 
 Le but de notre algorithme est de générer un ensemble de `moustiks` et de les faire jouer dans un environnement physique 2D. Un algorithme génétique est ensuite appliqué pour améliorer les performances de déplacement des `moustik`. Le critère utilisé pour départager les individus est la distance (positive) maximale parcourue par le `moustik`.
 
-## Choix du sujet
+## Déroulement du projet
+
+
 
 
 
@@ -31,42 +33,32 @@ Les différentes classes existant dans notre code sont:
   + Cette classe contient un attribut `b2Body* body` issu de la librairie moteur physique `Box2D` qui correspond à un point 2D de l'espace.
   + Le constructeur rattache à ce corps une `Box` qui vas permettre de gérer les collisions et de donner un _"volume"_ à la boîte. Cette boîte est de demie-largeur `width` et de demie-hauteur `height`.
   + L'attribut `type` définit si l'objet créé est fixe ou si il est dynamique (le sol est fixe, le `moustik` est dynamique).
-  + `diag` et `angleIn` correspondent à des données géométriques invariantes, mais utilisées lors du processus d'affichage. Pour éviter de faire des calculs trigonométriques couteux en processus inutilement, on préfère stocker ces valeurs directement en attribut.
+  + `diag` et `angleIn` correspondent à des données géométriques invariantes, mais utilisées lors du processus d'affichage. Pour éviter de faire des calculs trigonométriques coûteux en processus inutilement, on préfère stocker ces valeurs directement en attribut.
 
 + `Genome` cette classe contient l'information de notre moustique
 
   + Une séquence d'entiers `vector<int>`correspondant aux frames où le `moustik` change d'appui.
-  + Ainsi qu'un réel `fitness` qui correspond à la distance maximale atteinte par le moustik avec cette séquence _(le constructeur fixe sa valeur à -1)_.
-  + `tauxMutation` correspond à la probabilité qu'a un moustik de muter lorsqu'il rentre dans la phase de mutation.
+  + Ainsi qu'un réel `fitness` qui correspond à la distance maximale atteinte par le `moustik` avec cette séquence _(le constructeur fixe sa valeur à -1)_.
+  + `tauxMutation` correspond à la probabilité qu'a un `moustik` de muter lorsqu'il rentre dans la phase de mutation.
 
 + `Moustik` cette classe correspond au concept de notre animal bipède.
 
   + Il possède trois attributs `Forme`, correspondant à sa tête et à ses deux jambes.
-
-  + Il possède deux attributs de type `b2RevoluteJoint` permettant de définir les points de liaison entre la tête et chacune des jambes, les rotules peuvent aussi être activées en tant que moteur en définissant une vitesse de rotation désirée ainsi qu'un couple maximal.
-
-  + L'attribut `com` correspond à la commande utilisateur. Il vaut 0 initialement _(aucune jambe commandée)_ puis il oscille entre 1 et 2 pendant le jeu _(jambe gauche et jambe droite activée respectivement)_ . Un appui sur  s applique la transformation suivante :
-    $$
-    com = 1+com\%2
-    $$
-
++ Il possède deux attributs de type `b2RevoluteJoint` permettant de définir les points de liaison entre la tête et chacune des jambes, les rotules peuvent aussi être activées en tant que moteur en définissant une vitesse de rotation désirée ainsi qu'un couple maximal.
+  + L'attribut `com` correspond à la commande utilisateur. Il vaut 0 initialement _(aucune jambe commandée)_ puis il oscille entre 1 et 2 pendant le jeu _(jambe gauche et jambe droite activée respectivement)_ . Un appui sur  s applique la transformation suivante : $com=1+com\% 2$
+  
   + Le booléen `dead` correspond à si le `moustik` est tombé ou non.
-
   + Le réel `angleMax` correspond à l'angle maximal toléré pour les rotules.
-
   + L'attribut `controlType` vaut "human" ou "IA" et est utilisé pour l'écriture dans des fichiers texte des génomes respectifs.
-
   + Un attribut `génome` toutes les données génétiques nécessaires.
-
-  + Le booléen `seqWritten` permet de n'écrire qu'une fois la séquence de jeu du moustique.
-
++ Le booléen `seqWritten` permet de n'écrire qu'une fois la séquence de jeu du moustique.
+  
 + `MoustikIA` correspond à un `moustik` géré par l'ordinateur.
 
   + un entier `int` "ID" permet de le différencier de ses camarades générés par dizaines.
 
 + `Population` correspond à une génération de moustiks.
-
-  + Cette classe contient donc une liste `vector<MoustikIA*>` .
++ Cette classe contient donc une liste `vector<MoustikIA*>` .
   + Ainsi que l'entier `generation` correspondant à la génération de cette population.
 
 ### Diagramme de classe
@@ -229,7 +221,7 @@ La méthode `bestPop` issue de la classe `Population` est simplement un algorith
 
 #### `reproduction`
 
-On fait ensuite appel à la méthode`reproduction`
+On fait ensuite appel à la méthode`reproduction`. Celle-ci produit une population aussi nombreuse que le nombre de parents qu'on lui fait entrer. On détermine aléatoirement 2 parents que l'on fait se reproduire selon la méthode `crossAvg` et l'on répète cette opération jusqu'à avoir créé suffisamment d'enfants.
 
 ```cpp
 Population* Population::reproduction(Population pop){
@@ -249,7 +241,9 @@ Population* Population::reproduction(Population pop){
     }
     //on croise papa et maman pour donner un enfant
     Genome* genomei = pop.getMoustiks()[dad]->getGenome()->crossAvg(pop.getMoustiks()[mom]->getGenome());
+    //on instancie le fils dans l'environnement
     children[i] = new MoustikIA(ptrWorldIAs, Coord(0.0,3.0), genomei, to_string(i));
+    //on le désactive pour ne pas que les collisions ne soient pas calculées
     children[i]->activation(false);
   }
   return new Population(children, pop.getGeneration()+1);
@@ -267,29 +261,51 @@ Genome* Genome::crossAvg(Genome* genome){
   vector<int> seqout;
   vector<int> bigSeq;
   vector<int> litSeq;
-  float ratio; // fitnessBigSeq/fitnessLitSeq
   if (seq.size()>=genome->getRelativeSeq().size()){
     bigSeq = seq;
     litSeq = genome->getRelativeSeq();
-    ratio = fitness/genome->getFitness();
   } else {
     bigSeq = genome->getRelativeSeq();
     litSeq = seq;
-    ratio = genome->getFitness()/fitness;
   }
   for (int i=0; i<litSeq.size(); i++){
     //moyenne pondérée des dates par le ratio des fitness
-    seqout.push_back(bigSeq[i]*ratio + (1-ratio)*litSeq[i]);
+    seqout.push_back((bigSeq[i]+litSeq[i])/2);
   }
   for (int j=litSeq.size(); j<bigSeq.size();j++){
     //on complète sans moyenner avec la séquence qui est plus grande
     seqout.push_back(seq[j]);
   }
-  return new Genome(seqout, -1);
+  return new Genome(seqout, 0);
 }
 ```
 
+#### `mutateGroup`
 
+Cette méthode permet de modifier les `Genome` de tous les individus aléatoirement. Elle appelle la méthode `mutation` de la classe `Genome` pour tous les `moustik`. La séquence de jeu d'un individu ne doit être constitué que de dates strictement positives car elles correspondent à des intervalles de temps entre lesquels le `moustik` n'a pas changé de jambe. Il ne peut pas non plus changer deux fois de jambe à la même frame.
+
+```cpp 
+Genome* Genome::mutation(){
+  vector<int> mutseq=seq;
+  //on parcourt toutes les dates de la séquence.
+  for (int i=0; i<seq.size(); i++){
+    int prob = rand()%100/100;
+    if (prob<tauxMutation){
+      //alors mute et se modifie aléatoirement de +/- 5 frames
+      int mudate=abs(seq[i]+rand()%11-5); //on veut une valeur positive...
+      if (mudate==0){
+          mudate=1; //... positive stricte!
+      }
+      mutseq[i]=mudate;
+    }
+  }
+  return new Genome(mutseq, -1);
+}
+```
+
+## Conclusion
+
+### Difficultés rencontrées
 
 
 
