@@ -82,6 +82,8 @@ public:
 	Coord getPos();
   bool isDead();
   int getAge();
+	Genome* getGenome(); //on pourrait rendre cette fonction virtuelle
+  void setGenome(Genome*);
   void upAge();
   b2World* getWorld();
 	virtual bool undertaker();
@@ -99,8 +101,6 @@ protected:
 public:
 	MoustikIA(b2World*, Coord, Genome*, string);
 	MoustikIA(b2World*, Coord, vector<int>, string);
-	Genome* getGenome(); //on pourrait rendre cette fonction virtuelle
-  void setGenome(Genome*);
   void setID(string);
   string getID();
   void activation(bool);

@@ -129,6 +129,8 @@ class Moustik {
   + bool isDead()
   + int getAge()
   + void upAge()
+  + Genome* getGenome()
+  + void setGenome(Genome*)
   + virtual bool undertaker(int)
   + void updateFitness()
   + void reset(b2World*)
@@ -142,8 +144,6 @@ class MoustikIA {
   # int id
   + MoustikIA(b2World*, Coord, Genome, int)
   + MoustikIA(b2World*, Coord, vector[int], int)
-  + Genome* getGenome()
-  + void setGenome(Genome*)
   + void setID(string)
   + string getID()
   + void activation(bool)

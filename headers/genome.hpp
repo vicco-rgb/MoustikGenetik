@@ -46,10 +46,10 @@ public:
   int getGeneration();
   void setGeneration(int);
 
-  Population bests(int);
-  Population reproduction(Population);
-  Population mutateGroup(Population);
-  Population getChildren(int);
+  Population* bests(int);
+  Population* reproduction(Population);
+  Population* mutateGroup(Population);
+  Population* getChildren(int);
 
   MoustikIA* playLive();
   void playOff();

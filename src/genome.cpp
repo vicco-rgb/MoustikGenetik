@@ -123,17 +123,21 @@ Genome* Genome::crossAvg(Genome* genome){
   return fils;
 }
 Genome* Genome::mutation(){
-  Genome *mutated = new Genome();
-  int n = rand()%100;
-  if (n<tauxMutation*100){
-    seq[rand()%seq.size()]=rand()%10;
+  vector<int> mutseq=seq;
+
+  for (int i=0; i<seq.size(); i++){
+    int prob = rand()%100/100;
+    if (prob<tauxMutation){
+      //alors on modifie la date ciblée de quelques frames ()
+      int mudate=abs(seq[i]+rand()%11-5); //on veut une valeur positive...
+      if (mudate==0){
+        mudate=1; //... positive stricte!
+      }
+      mutseq[i]=mudate;
+    }
   }
-  mutated->seq=seq;
-  mutated->fitness=-1;
-  for (int i=0;i<mutated->seq.size();i++){
-    mutated->fitness+=mutated->seq[i];
-  }
-  return mutated;
+
+  return new Genome(mutseq, -1);
 }
 bool Genome::betterThan(Genome* genome){
   return (fitness > genome->fitness);
@@ -172,7 +176,7 @@ void Population::setGeneration(int gen){
   generation=gen;
 }
 //mutation
-Population Population::bests(int n){
+Population* Population::bests(int n){
   int best=0;
   //on trie les moustiks selon leur fitness
   for(int i=0;i<moustiks.size()-1;i++){
@@ -196,9 +200,9 @@ Population Population::bests(int n){
   while (bestMoustiks.size()<n){
     bestMoustiks.push_back(moustiks[i]);
   }
-  return Population(bestMoustiks, generation);
+  return new Population(bestMoustiks, generation);
 }
-Population Population::reproduction(Population pop){
+Population* Population::reproduction(Population pop){
   int size=pop.getMoustiks().size();
   vector<MoustikIA*> children = pop.getMoustiks();
   for (int i=0;i<size;i++){
@@ -211,30 +215,31 @@ Population Population::reproduction(Population pop){
     }
     children[i]->setGenome(pop.getMoustiks()[dad]->getGenome()->crossAvg(pop.getMoustiks()[mom]->getGenome()));
   }
-  return Population(children, pop.getGeneration()+1);
+  return new Population(children, pop.getGeneration()+1);
 }
-Population Population::mutateGroup(Population pop){
+Population* Population::mutateGroup(Population pop){
   vector<MoustikIA*> mutatedMoustiks = pop.getMoustiks();
   for (int i=0; i<pop.getMoustiks().size();i++){
     pop.getMoustiks()[i]->setGenome(pop.getMoustiks()[i]->getGenome()->mutation());
     mutatedMoustiks[i]=pop.getMoustiks()[i];
   }
-  return Population(mutatedMoustiks, pop.getGeneration());
+  return new Population(mutatedMoustiks, pop.getGeneration());
 }
-Population Population::getChildren(int n){
+Population* Population::getChildren(int n){
   //cette fonction renvoie une population correspondant aux enfants issus des nmeilleurs parents de la population manipulée.
   //La population manipulée n'est pas écrasée
-  if (n>moustiks.size()){ //pour ne pas faire planter l'algorithme
-  n=moustiks.size();
-}
-Population bestPop = bests(n); //les trouve les n meilleurs parents
-Population newGeneration = reproduction(bestPop); //on récupère les n enfants (incrémente generation)
-while (newGeneration.getMoustiks().size()<moustiks.size()){
-  //on recrée une population de la taille originale en complétant avec les meilleurs parents.
-  newGeneration.addMoustik(bestPop.getMoustiks()[rand()%n]);
-}
-newGeneration = mutateGroup(newGeneration); // on les fait muter
-return newGeneration;
+  if (n>moustiks.size()){
+    //pour ne pas faire planter l'algorithme
+    n=moustiks.size();
+  }
+  Population* bestPop = bests(n); //les trouve les n meilleurs parents
+  Population* newGeneration = reproduction(bestPop); //on récupère les n enfants (incrémente generation)
+  while (newGeneration->getMoustiks().size()<moustiks.size()){
+    //on recrée une population de la taille originale en complétant avec les meilleurs parents.
+    newGeneration->addMoustik(bestPop->getMoustiks()[rand()%n]);
+  }
+  newGeneration = mutateGroup(newGeneration); // on les fait muter
+  return newGeneration;
 }
 MoustikIA* Population::playLive(){
   for (int i=0; i<moustiks.size(); i++){
@@ -309,7 +314,6 @@ vector<Genome*> Population::readGenomes(string filename){
       sequence.push_back(stoi(datestr));
       seqtxt=seqtxt.substr(seqtxt.find('_')+1, seqtxt.size());
     }
-    // + la dernière date n'étant pas suivie par "_"
     getline(fichier, fitxt);
 
     //on empile les génomes un par un

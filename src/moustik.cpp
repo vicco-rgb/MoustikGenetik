@@ -209,6 +209,12 @@ void Moustik::upAge(){
 b2World* Moustik::getWorld(){
   return ptrHead->getBody()->GetWorld();
 }
+Genome* Moustik::getGenome(){
+  return genome;
+}
+void Moustik::setGenome(Genome* genome){
+  this->genome=genome;
+}
 //jeu
 void Moustik::reset(){
   seqWritten=false;
@@ -320,7 +326,7 @@ void Moustik::writeGenome(bool erase){
     outfile.open("../sequences/"+controlType+".txt", ios_base::app);
   }
   for (int i=0;i<sequence.size();i++){
-    outfile<<sequence[i]<<"\t";
+    outfile<<sequence[i]<<"_";
   }
   outfile<<"\n"<<fitness<<"\n"; //correspond à fitness
   outfile.close();
@@ -340,12 +346,6 @@ MoustikIA::MoustikIA(b2World* ptrWorld, Coord pos, vector<int> seq, string id) :
   genome = new Genome(seq, -1);
 }
 //get-set
-Genome* MoustikIA::getGenome(){
-  return genome;
-}
-void MoustikIA::setGenome(Genome* genome){
-  this->genome=genome;
-}
 void MoustikIA::setID(string newID){
   id=newID;
 }

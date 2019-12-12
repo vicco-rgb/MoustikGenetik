@@ -40,45 +40,48 @@ void reshape(GLsizei width, GLsizei height) {
 }
 GLvoid drawQuadrillage(int x1,int x2, int y1, int y2){
 	for (int i=y1;i<y2;i++){  //horizontales
-		glBegin(GL_QUADS);
-		glColor3f(0.2f,0.2f,0.2f);
+		glBegin(GL_LINES);
+		glColor3f(0.2f,0.4f,0.2f);
 		glVertex2f(x1, i);
-		glColor3f(0.2f,0.2f,0.2f);
-		glVertex2f(x1, i-0.05);
-		glColor3f(0.2f,0.2f,0.2f);
-		glVertex2f(x2, i-0.05);
-		glColor3f(0.2f,0.2f,0.2f);
+		glColor3f(0.2f,0.4f,0.2f);
 		glVertex2f(x2, i);
 		glEnd();
+		glLineWidth(3.0f);
 		glFlush();
 	}
 	for (int j=x1;j<x2;j++){ //verticales
-		glBegin(GL_QUADS);
-		glColor3f(0.2f,0.2f,0.2f);
-		glVertex2f(j-0.05, y2);
-		glColor3f(0.2f,0.2f,0.2f);
-		glVertex2f(j-0.05, y1);
-		glColor3f(0.2f,0.2f,0.2f);
+		glBegin(GL_LINES);
+		glColor3f(0.2f,0.4f,0.2f);
 		glVertex2f(j, y1);
-		glColor3f(0.2f,0.2f,0.2f);
+		glColor3f(0.2f,0.4f,0.2f);
 		glVertex2f(j, y2);
 		glEnd();
+		glLineWidth(3.0f);
 		glFlush();
 	}
 }
 GLvoid affichage(){
 	glClear(GL_COLOR_BUFFER_BIT); 	// Effacement du frame buffer
 
+	if (grid){ //affichage de la grille
+		drawQuadrillage(floor(abscisse)-2,floor(abscisse)+5,-2,3);
+	}
 	if (channel) { //vrai monde
 		cousin->drawOpenGL();
 		ground->drawOpenGL();
 	} else {
 		groundIAs->drawOpenGL(0.7f,0.7f,1.0f);
 		cousinIA->drawOpenGL();
+		float fitness = cousinIA->getGenome()->getFitness();
+		glBegin(GL_LINES);
+		glColor3f(1.0f, 0.6f, 0.6f);
+		glVertex2f(fitness, -1.0);
+		glColor3f(1.0f, 0.6f, 0.6f);
+		glVertex2f(fitness, 3.0);
+		glEnd();
+		glLineWidth(3.0f);
+		glFlush();
 		//faire passer les moustiks les uns après les autres.
-	}
-	if (grid){ //affichage de la grille
-		drawQuadrillage(floor(abscisse)-2,floor(abscisse)+5,-2,3);
 	}
 	glLoadIdentity();
 	gluOrtho2D(abscisse-2.0, abscisse+4.0, -1.0, 3.0);

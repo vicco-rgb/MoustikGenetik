@@ -53,22 +53,21 @@ void Init(){
 	groundIAs = new Forme(ptrWorldIAs, Coord(0.0,-1.0), 100.0, 1.0, 1); //! peut-être trop court !
 	HomoSapiens = new Population();
 	// //ALEATOIRE
-	// for (int i=0; i<10; i++){
-	// 	Genome* genomeIA = new Genome(40);
-	// 	MoustikIA* cousinIA = new MoustikIA(ptrWorldIAs, Coord(0.0,3.0), genomeIA, to_string(i));
-	// 	cousinIA->activation(false); //on rend le moustik inactif
-	// 	HomoSapiens->addMoustik(cousinIA);
-	// }
-
-	//READFILE
-	vector<Genome*> genomes=HomoSapiens->readGenomes("human.txt");
-	for (int i=0; i<genomes.size(); i++){
-		MoustikIA* cousinIA = new MoustikIA(ptrWorldIAs, Coord(0.0,3.0), genomes[i], to_string(i));
+	for (int i=0; i<10; i++){ // nombre d'individu dans la population.
+		Genome* genomeIA = new Genome(40);
+		MoustikIA* cousinIA = new MoustikIA(ptrWorldIAs, Coord(0.0,3.0), genomeIA, to_string(i));
 		cousinIA->activation(false); //on rend le moustik inactif
-		cousinIA->setGenome(genomes[i]);
 		HomoSapiens->addMoustik(cousinIA);
 	}
-	cout<<HomoSapiens->getMoustiks().size()<<*HomoSapiens<<endl;
+
+	//READFILE
+	// vector<Genome*> genomes=HomoSapiens->readGenomes("human.txt");
+	// for (int i=0; i<genomes.size(); i++){
+	// 	MoustikIA* cousinIA = new MoustikIA(ptrWorldIAs, Coord(0.0,3.0), genomes[i], to_string(i));
+	// 	cousinIA->activation(false); //on rend le moustik inactif
+	// 	cousinIA->setGenome(genomes[i]);
+	// 	HomoSapiens->addMoustik(cousinIA);
+	// }
 
 }
 
@@ -82,8 +81,10 @@ int main(int argc, char** argv){
 	srand(time(0));
 
 	Init(); 	//définition des variables.
-	HomoSapiens->playOff();
-	HomoSapiens->writeGenomes();
+	// HomoSapiens->playOff();
+	// Population* HomoSapiens2 = HomoSapiens->getChildren(5);
+	// HomoSapiens->writeGenomes();
+	// HomoSapiens2->writeGenomes();
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);	// Choix du mode d'affichage (ici RVB)
