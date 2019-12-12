@@ -1,4 +1,5 @@
 # Compte Rendu
+
 _Chloé Leric_ et _Victor Duvivier_.
 
 Notre projet consiste en l'application d'un ou de plusieurs algorithmes génétiques sur un mini-jeu. Nous nous sommes inspirés du mini-jeu [Daddy Long Legs](https://play.google.com/store/apps/details?id=com.setsnail.daddylonglegs&hl=fr)
@@ -15,13 +16,16 @@ Notre projet consiste en l'application d'un ou de plusieurs algorithmes généti
 
 Le but de notre algorithme est de générer un ensemble de `moustiks` et de les faire jouer dans un environnement physique 2D. Un algorithme génétique est ensuite appliqué pour améliorer les performances de déplacement des `moustik`. Le critère utilisé pour départager les individus est la distance (positive) maximale parcourue par le `moustik`.
 
-## Décision du sujet
+## Choix du sujet
 
 
 
 ## Description du code
 
+### Description classes
+
 Les différentes classes existant dans notre code sont:
+
 + `Forme` cette classe correspond à un rectangle physique. Elle permet d'automatiser la création de boîtes physiques et facilite l'écriture des fonctions d'affichage de ces formes sous `OpenGL`.
 
   + Cette classe contient un attribut `b2Body* body` issu de la librairie moteur physique `Box2D` qui correspond à un point 2D de l'espace.
@@ -191,6 +195,105 @@ class Population {
   + vector<Genome*> readGenomes(string)
 }
 ```
+
+### Description méthode algorithme génétique
+
+#### `getChildren`
+
+La classe `Population` possède une méthode `getChildren` qui permet d'obtenir la génération suivante en renvoyant une nouvelle population. 
+
+```cpp
+Population* Population::getChildren(int n){
+  //renvoie la population fille contenant le même nombre d'individus. Elle a été formée à partir des n meilleurs parents.
+  if (n>moustiks.size()){
+    //pour ne pas faire planter l'algorithme
+    n=moustiks.size();
+  }
+  //on trie la population active selon leur fitness et on récupère les n meilleurs individus
+  Population* bestPop = bests(n);
+  //on produit n enfants à partir des n meilleurs parents
+  Population* newGeneration = reproduction(bestPop);
+  while (newGeneration->getMoustiks().size()<moustiks.size()){
+    //on complète la population fille avec les meilleurs parents pris aléatoirement.
+    newGeneration->addMoustik(bestPop->getMoustiks()[rand()%n]);
+  }
+  //chaque date de chaque génome a une probabilité d'évolution.
+  newGeneration = mutateGroup(newGeneration);
+  return newGeneration;
+}
+```
+
+#### `bestPop`
+
+La méthode `bestPop` issue de la classe `Population` est simplement un algorithme de tri suivi d'un remplissage d'un vecteur. Peu spécifique, nous ne détaillerons pas son fonctionnement ici.
+
+#### `reproduction`
+
+On fait ensuite appel à la méthode`reproduction`
+
+```cpp
+Population* Population::reproduction(Population pop){
+  //size = nombre de parents
+  int size=pop.getMoustiks().size();
+  //on vas générer autant d'enfants que de parents
+  vector<MoustikIA*> children = pop.getMoustiks();
+  //pour initialisation des nouveaux moustiks, on a besoin d'un pointeur vers une classe issue de la librairie Box2D.
+  b2World* ptrWorldIAs = moustiks[0]->getWorld(); 
+  for (int i=0;i<size;i++){
+    //on cherche un papa et une maman pour l'enfant au hasard.
+    int dad=rand()%size;
+    int mom=rand()%size;
+    while (dad==mom){
+      //papa et maman doivent être différents.
+      mom=rand()%size;
+    }
+    //on croise papa et maman pour donner un enfant
+    Genome* genomei = pop.getMoustiks()[dad]->getGenome()->crossAvg(pop.getMoustiks()[mom]->getGenome());
+    children[i] = new MoustikIA(ptrWorldIAs, Coord(0.0,3.0), genomei, to_string(i));
+    children[i]->activation(false);
+  }
+  return new Population(children, pop.getGeneration()+1);
+}
+```
+
+##### `crossAvg`
+
+La méthode appelée à la ligne 17 issue de la classe `Génome` permet de croiser deux parents. Cette méthode produit un enfant génome à partir de deux parents en faisant la moyenne de chaque paire de dates. On a nommé les séquences `litSeq` et `bigSeq` dans l'éventualité où une séquence serait plus grande que l'autre. 
+
+Si la séquence du père est plus grande que la séquence de la mère par exemple, alors on moyenne les (nombres-de-dates-dans-la-séquence-de-la-mère) premières dates du père et de la mère et on ajoute ensuite  à la séquence fille les dernières dates du père.
+
+```cpp 
+Genome* Genome::crossAvg(Genome* genome){
+  vector<int> seqout;
+  vector<int> bigSeq;
+  vector<int> litSeq;
+  float ratio; // fitnessBigSeq/fitnessLitSeq
+  if (seq.size()>=genome->getRelativeSeq().size()){
+    bigSeq = seq;
+    litSeq = genome->getRelativeSeq();
+    ratio = fitness/genome->getFitness();
+  } else {
+    bigSeq = genome->getRelativeSeq();
+    litSeq = seq;
+    ratio = genome->getFitness()/fitness;
+  }
+  for (int i=0; i<litSeq.size(); i++){
+    //moyenne pondérée des dates par le ratio des fitness
+    seqout.push_back(bigSeq[i]*ratio + (1-ratio)*litSeq[i]);
+  }
+  for (int j=litSeq.size(); j<bigSeq.size();j++){
+    //on complète sans moyenner avec la séquence qui est plus grande
+    seqout.push_back(seq[j]);
+  }
+  return new Genome(seqout, -1);
+}
+```
+
+
+
+
+
+
 
 ## Bibliographie
 

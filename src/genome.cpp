@@ -102,25 +102,22 @@ Genome* Genome::crossAvg(Genome* genome){
   vector<int> seqout;
   vector<int> bigSeq;
   vector<int> litSeq;
-  float ratio; // fitnessBigSeq/fitnessLitSeq
   if (seq.size()>=genome->getRelativeSeq().size()){
     bigSeq = seq;
     litSeq = genome->getRelativeSeq();
-    ratio = fitness/genome->getFitness();
   } else {
     bigSeq = genome->getRelativeSeq();
     litSeq = seq;
-    ratio = genome->getFitness()/fitness;
   }
   for (int i=0; i<litSeq.size(); i++){
     //moyenne pondérée des dates par le ratio des fitness
-    seqout.push_back(bigSeq[i]*ratio + (1-ratio)*litSeq[i]);
+    seqout.push_back((bigSeq[i]+litSeq[i])/2);
   }
   for (int j=litSeq.size(); j<bigSeq.size();j++){
     //on complète sans moyenner avec la séquence qui est plus grande
     seqout.push_back(seq[j]);
   }
-  return new Genome(seqout, -1);
+  return new Genome(seqout, 0);
 }
 Genome* Genome::mutation(){
   vector<int> mutseq=seq;
