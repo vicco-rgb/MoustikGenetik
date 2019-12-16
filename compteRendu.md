@@ -1,4 +1,4 @@
-# Compte Rendu
+# **Compte rendu** / Projet 1 RV
 
 _Chloé Leric_ et _Victor Duvivier_.
 
@@ -18,8 +18,10 @@ Le but de notre algorithme est de générer un ensemble de `moustiks` et de les 
 
 ## Déroulement du projet
 
-
-
+Nous avons travaillé sur ce projet en deux grandes étapes qui se sont superposées au milieu du projet. La première partie du projet a été de modéliser l'environnement physique et les déplacements du personnage, et la seconde d'implémenter un algorithme génétique qui permettrait de faire avancer le plus loin possible notre personnage.
+#### Première partie : la marche
+Durant environ le premier mois, nous nous sommes concentrés uniquement sur le fait d'implémenter les mouvements du moustik, contrôlés par l'usager. Notre approche a été tout d'abord d'imiter un environnement physique, sans pour autant faire entrer en jeu des concepts d'accélération ou d'inertie, simplement en faisant "tomber" le moustik à chaque fois que sa jambe effectuait une rotation par l'utilisateur. Mais rapidement, nous nous sommes rendu compte que cette méthode laissait place à trop d'incertitude et de subjectivité quant au déplacement du moustik : le moindre changement dans une modalité de contrôle du mouvement provoquait un impact non maîtrisable sur la marche du moustik. Ainsi, dans les premières semaines de programmation, le moustik était incapable de faire plus de 2 ou 3 pas sans mourir, puis des changements dans la logique de marche firent qu'il pouvait marcher presque à l'infini sans jamais tomber. Nous avons alors eu l'idée d'augmenter la difficulté en créant un terrain avec des obstacles, mais cela dérégla la logique de marche et le moustik ne pouvait quasiment plus avancer.
+### Deuxième partie : l'algorithme génétique
 
 
 ## Description du code
@@ -46,13 +48,13 @@ Les différentes classes existant dans notre code sont:
   + Il possède trois attributs `Forme`, correspondant à sa tête et à ses deux jambes.
 + Il possède deux attributs de type `b2RevoluteJoint` permettant de définir les points de liaison entre la tête et chacune des jambes, les rotules peuvent aussi être activées en tant que moteur en définissant une vitesse de rotation désirée ainsi qu'un couple maximal.
   + L'attribut `com` correspond à la commande utilisateur. Il vaut 0 initialement _(aucune jambe commandée)_ puis il oscille entre 1 et 2 pendant le jeu _(jambe gauche et jambe droite activée respectivement)_ . Un appui sur  s applique la transformation suivante : $com=1+com\% 2$
-  
+
   + Le booléen `dead` correspond à si le `moustik` est tombé ou non.
   + Le réel `angleMax` correspond à l'angle maximal toléré pour les rotules.
   + L'attribut `controlType` vaut "human" ou "IA" et est utilisé pour l'écriture dans des fichiers texte des génomes respectifs.
   + Un attribut `génome` toutes les données génétiques nécessaires.
 + Le booléen `seqWritten` permet de n'écrire qu'une fois la séquence de jeu du moustique.
-  
+
 + `MoustikIA` correspond à un `moustik` géré par l'ordinateur.
 
   + un entier `int` "ID" permet de le différencier de ses camarades générés par dizaines.
@@ -192,7 +194,7 @@ class Population {
 
 #### `getChildren`
 
-La classe `Population` possède une méthode `getChildren` qui permet d'obtenir la génération suivante en renvoyant une nouvelle population. 
+La classe `Population` possède une méthode `getChildren` qui permet d'obtenir la génération suivante en renvoyant une nouvelle population.
 
 ```cpp
 Population* Population::getChildren(int n){
@@ -230,7 +232,7 @@ Population* Population::reproduction(Population pop){
   //on vas générer autant d'enfants que de parents
   vector<MoustikIA*> children = pop.getMoustiks();
   //pour initialisation des nouveaux moustiks, on a besoin d'un pointeur vers une classe issue de la librairie Box2D.
-  b2World* ptrWorldIAs = moustiks[0]->getWorld(); 
+  b2World* ptrWorldIAs = moustiks[0]->getWorld();
   for (int i=0;i<size;i++){
     //on cherche un papa et une maman pour l'enfant au hasard.
     int dad=rand()%size;
@@ -252,11 +254,11 @@ Population* Population::reproduction(Population pop){
 
 ##### `crossAvg`
 
-La méthode appelée à la ligne 17 issue de la classe `Génome` permet de croiser deux parents. Cette méthode produit un enfant génome à partir de deux parents en faisant la moyenne de chaque paire de dates. On a nommé les séquences `litSeq` et `bigSeq` dans l'éventualité où une séquence serait plus grande que l'autre. 
+La méthode appelée à la ligne 17 issue de la classe `Génome` permet de croiser deux parents. Cette méthode produit un enfant génome à partir de deux parents en faisant la moyenne de chaque paire de dates. On a nommé les séquences `litSeq` et `bigSeq` dans l'éventualité où une séquence serait plus grande que l'autre.
 
 Si la séquence du père est plus grande que la séquence de la mère par exemple, alors on moyenne les (nombres-de-dates-dans-la-séquence-de-la-mère) premières dates du père et de la mère et on ajoute ensuite  à la séquence fille les dernières dates du père.
 
-```cpp 
+```cpp
 Genome* Genome::crossAvg(Genome* genome){
   vector<int> seqout;
   vector<int> bigSeq;
@@ -284,7 +286,7 @@ Genome* Genome::crossAvg(Genome* genome){
 
 Cette méthode permet de modifier les `Genome` de tous les individus aléatoirement. Elle appelle la méthode `mutation` de la classe `Genome` pour tous les `moustik`. La séquence de jeu d'un individu ne doit être constitué que de dates strictement positives car elles correspondent à des intervalles de temps entre lesquels le `moustik` n'a pas changé de jambe. Il ne peut pas non plus changer deux fois de jambe à la même frame.
 
-```cpp 
+```cpp
 Genome* Genome::mutation(){
   vector<int> mutseq=seq;
   //on parcourt toutes les dates de la séquence.
