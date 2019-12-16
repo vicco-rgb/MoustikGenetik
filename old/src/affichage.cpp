@@ -136,6 +136,7 @@ GLvoid affichage(){
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glVertex2f(cousin.getPosG1().x,cousin.getPosG1().y);
 	glEnd();
+	glLineWidth(2.0)
 	glFlush();
 
 	glBegin(GL_LINES); //CUISSE 2
@@ -144,6 +145,7 @@ GLvoid affichage(){
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glVertex2f(cousin.getPosG2().x,cousin.getPosG2().y);
 	glEnd();
+	glLineWidth(2.0)
 	glFlush();
 
 	glBegin(GL_LINES); //TIBIA 1
@@ -152,6 +154,7 @@ GLvoid affichage(){
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glVertex2f(cousin.getPosP1().x,cousin.getPosP1().y);
 	glEnd();
+	glLineWidth(2.0)
 	glFlush();
 
 	glBegin(GL_LINES); //TIBIA 2
@@ -160,6 +163,7 @@ GLvoid affichage(){
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glVertex2f(cousin.getPosP2().x,cousin.getPosP2().y);
 	glEnd();
+	glLineWidth(2.0)
 	glFlush();
 
 	glLoadIdentity();

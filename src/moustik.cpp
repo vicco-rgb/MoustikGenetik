@@ -218,17 +218,21 @@ void Moustik::setGenome(Genome* genome){
 //jeu
 void Moustik::reset(){
   seqWritten=false;
+  b2World* leWorld = ptrHead->getBody()->GetWorld();
   delete ptrHead;
   delete ptrLegL;
   delete ptrLegR;
-  //cette fonction ressemble au constructeur mais ne réinitialise pas le score, ni angleMax.
+  delete genome;
+
   com = 0;
   dead = false;
+  genome=new Genome();
+
   //definition of bodies
   Coord pos(0, 2);
-  ptrHead = new Forme(getWorld(), pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
-  ptrLegL = new Forme(getWorld(), pos+Coord(-0.25,-1.05), 0.05, 0.8, 0); //jambe dynamique de 0.1x1
-  ptrLegR = new Forme(getWorld(), pos+Coord(0.25,-1.05), 0.05, 0.8, 0); //jambe dynamique de 0.1x1
+  ptrHead = new Forme(leWorld, pos, 0.25, 0.25, 0); //tête dynamique de 0.5x0.5
+  ptrLegL = new Forme(leWorld, pos+Coord(-0.25,-1.05), 0.05, 0.8, 0); //jambe dynamique de 0.1x1
+  ptrLegR = new Forme(leWorld, pos+Coord(0.25,-1.05), 0.05, 0.8, 0); //jambe dynamique de 0.1x1
   //définition de la rotuleL et rotuleR
   b2RevoluteJointDef defRotuleL;
   b2RevoluteJointDef defRotuleR;

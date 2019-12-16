@@ -7,21 +7,21 @@
 #include <GL/glut.h>
 #endif
 
-struct Coord {
+struct coord {
 	float x;
 	float y;
 };
-std::ostream& operator<<(std::ostream&s, Coord const&);
-class Moustik {
+
+class moustik {
 private:
-	Coord M; // Coordonnées centre de masse de la tete
+	coord M; // coordonnées centre de masse de la tete
 	float a1, a2, b, c, d1, d2; // angles
 	float L,H,T; // longueur jambe, hauteur tete, largeur tete
 	float diag; //demi diagonale de la tête
 public:
-	Moustik();
-	Moustik(float,float,float);
-	~Moustik();
+	moustik();
+	moustik(float,float,float);
+	~moustik();
 
 	float getL() const;
 	float getH() const;
@@ -39,14 +39,14 @@ public:
 	void setD1(float);
 	void setD2(float);
 
-	Coord getPosM() const; //centre masse
-	void setPosM(Coord);
-	Coord getPosT1() const; //tête
-	Coord getPosT2() const;
-	Coord getPosH1() const; //hanches
-	Coord getPosH2() const;
-	Coord getPosG1() const; //genoux
-	Coord getPosG2() const;
-	Coord getPosP1() const; //pieds
-	Coord getPosP2() const;
+	coord getPosM() const; //centre masse
+	void setPosM(coord);
+	coord getPosT1() const; //tête
+	coord getPosT2() const;
+	coord getPosH1() const; //hanches
+	coord getPosH2() const;
+	coord getPosG1() const; //genoux
+	coord getPosG2() const;
+	coord getPosP1() const; //pieds
+	coord getPosP2() const;
 };
