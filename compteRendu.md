@@ -19,8 +19,12 @@ Le but de notre algorithme est de générer un ensemble de `moustiks` et de les 
 ## Déroulement du projet
 
 Nous avons travaillé sur ce projet en deux grandes étapes qui se sont superposées au milieu du projet. La première partie du projet a été de modéliser l'environnement physique et les déplacements du personnage, et la seconde d'implémenter un algorithme génétique qui permettrait de faire avancer le plus loin possible notre personnage.
-#### Première partie : la marche
-Durant environ le premier mois, nous nous sommes concentrés uniquement sur le fait d'implémenter les mouvements du moustik, contrôlés par l'usager. Notre approche a été tout d'abord d'imiter un environnement physique, sans pour autant faire entrer en jeu des concepts d'accélération ou d'inertie, simplement en faisant "tomber" le moustik à chaque fois que sa jambe effectuait une rotation par l'utilisateur. Mais rapidement, nous nous sommes rendu compte que cette méthode laissait place à trop d'incertitude et de subjectivité quant au déplacement du moustik : le moindre changement dans une modalité de contrôle du mouvement provoquait un impact non maîtrisable sur la marche du moustik. Ainsi, dans les premières semaines de programmation, le moustik était incapable de faire plus de 2 ou 3 pas sans mourir, puis des changements dans la logique de marche firent qu'il pouvait marcher presque à l'infini sans jamais tomber. Nous avons alors eu l'idée d'augmenter la difficulté en créant un terrain avec des obstacles, mais cela dérégla la logique de marche et le moustik ne pouvait quasiment plus avancer.
+### Première partie : la marche
+
+Durant environ le premier mois, nous nous sommes concentrés uniquement sur le fait d'implémenter les mouvements du moustik, contrôlés par l'utilisateur. Notre approche a été tout d'abord d'imiter un environnement physique, sans pour autant faire entrer en jeu des concepts d'accélération ou d'inertie, mais au contraire en la simplifiant au maximum. Le M
+
+simplement en faisant "tomber" le moustik à chaque fois que sa jambe effectuait une rotation par l'utilisateur. Mais rapidement, nous nous sommes rendu compte que cette méthode laissait place à trop d'incertitude et de subjectivité quant au déplacement du moustik : le moindre changement dans une modalité de contrôle du mouvement provoquait un impact non maîtrisable sur la marche du moustik. Ainsi, dans les premières semaines de programmation, le moustik était incapable de faire plus de 2 ou 3 pas sans mourir, puis des changements dans la logique de marche firent qu'il pouvait marcher presque à l'infini sans jamais tomber. Nous avons alors eu l'idée d'augmenter la difficulté en créant un terrain avec des obstacles, mais cela dérégla la logique de marche et le moustik ne pouvait quasiment plus avancer.
+
 ### Deuxième partie : l'algorithme génétique
 
 
